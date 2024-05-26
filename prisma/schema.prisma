@@ -1,0 +1,228 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// MODELS
+
+model User {
+  id       Int       @id @default(autoincrement())
+  userId   String
+  username String
+  password String
+  role     USER_ROLE
+  createAt DateTime  @default(now())
+}
+
+model Student {
+  id                    String               @id @default(uuid())
+  index_number          Int
+  first_name            String
+  last_name             String
+  other_names           String
+  age                   Int
+  dob                   DateTime //
+  School                School               @relation(fields: [schoolId], references: [id]) //
+  schoolId              String
+  gender                GENDER
+  year                  Int //
+  family_size           FAMILY_SIZE
+  parent_status         PARENT_STATUS
+  mother_education      String
+  father_education      String
+  mother_job            JOB
+  father_job            JOB
+  school_choice_reason  SCHOOL_CHOICE_REASON
+  guardian              GUARDIAN
+  travel_time           TRAVEL_TIME
+  study_time            WEEKLY_STUDY_TIME
+  class_failures        Int
+  school_support        Boolean
+  family_support        Boolean
+  address_type          ADDRESS_TYPE
+  extra_paid_classes    Boolean
+  activities            Boolean
+  nursery_school        Boolean
+  higher_ed             Boolean
+  internet_access       Boolean
+  romantic_relationship Boolean
+  family_relationship   Int
+  free_time             Int
+  social                Int
+  absences              Int
+  math_intensive        Boolean
+  time_registered       DateTime             @default(now()) //
+  Attendance            Attendance[]
+  Grade                 Grade[]
+  region                String //
+  district              String //
+  course                Course               @relation(fields: [courseId], references: [id])
+  courseId              String
+  updatedAt             DateTime             @updatedAt
+  imagePath             String
+}
+
+model Grade {
+  id          Int      @id @default(autoincrement())
+  subject     Subject  @relation(fields: [subjectId], references: [id])
+  subjectId   String
+  semester    SEMESTER
+  student     Student  @relation(fields: [studentId], references: [id])
+  studentId   String
+  score       Float
+  dateEntered DateTime @default(now())
+}
+
+model School {
+  id                  String               @id @default(uuid())
+  name                String
+  region              String
+  district            String
+  Student             Student[]
+  Teacher             Teacher[]
+  SchoolAdministrator SchoolAdministrator?
+}
+
+model Teacher {
+  id                    String   @id @default(uuid())
+  first_name            String
+  last_name             String
+  other_names           String
+  email                 String
+  gender                GENDER
+  region                String
+  district              String
+  educational_level     String
+  num_seminars_attended Int
+  length_of_service     Int
+  school                School   @relation(fields: [schoolId], references: [id])
+  schoolId              String
+  subject               Subject  @relation(fields: [subjectId], references: [id])
+  subjectId             String
+  updatedAt             DateTime @updatedAt
+  imagePath             String
+}
+
+model SchoolAdministrator {
+  id          String @id @default(uuid())
+  first_name  String
+  last_name   String
+  other_names String
+  email       String
+  school      School @relation(fields: [schoolId], references: [id])
+  schoolId    String @unique
+  imagePath   String
+}
+
+model Course {
+  id        String    @id @default(uuid())
+  name      String
+  Subject   Subject[]
+  Student   Student[]
+  updatedAt DateTime  @updatedAt
+}
+
+model Subject {
+  id        String    @id @default(uuid())
+  name      String
+  course    Course    @relation(fields: [courseId], references: [id])
+  courseId  String
+  Grade     Grade[]
+  Teacher   Teacher[]
+  updatedAt DateTime  @updatedAt
+}
+
+model Attendance {
+  id        String   @id @default(uuid())
+  date      DateTime @default(now())
+  present   Boolean
+  semester  Int
+  student   Student  @relation(fields: [studentId], references: [id])
+  studentId String
+}
+
+// ENUMS
+enum USER_ROLE {
+  admin
+  schoolAdmin
+  teacher
+  student
+}
+
+enum GENDER {
+  male
+  female
+}
+
+enum PARENT_STATUS {
+  together
+  apart
+}
+
+enum ADDRESS_TYPE {
+  rural
+  urban
+}
+
+enum FAMILY_SIZE {
+  less_than_or_equal_to_3
+  greater_than_3
+}
+
+enum EDUCATION {
+  none
+  elementary
+  middle
+  secondary
+  higher_education
+}
+
+enum JOB {
+  unemployed
+  civil
+  health
+  education
+  other
+}
+
+enum SCHOOL_CHOICE_REASON {
+  home
+  reputation
+  course
+  other
+}
+
+enum GUARDIAN {
+  mother
+  father
+  other
+}
+
+enum TRAVEL_TIME {
+  less_than_15
+  within_15_and_30
+  within_30_and_hour
+  greater_than_hour
+}
+
+enum WEEKLY_STUDY_TIME {
+  less_than_2_hours
+  within_2_and_5_hours
+  within_5_and_10_hours
+  greater_than_10_hours
+}
+
+enum SEMESTER {
+  first
+  second
+}
