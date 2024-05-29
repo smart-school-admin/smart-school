@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
 
+/** shadcn */
+import { cn } from "@/lib/utils";
+
 const inter = Inter({ subsets: ["latin"] });
+const fontMontserrat = Montserrat({
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,7 +23,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body
+        className={cn(
+          "min-h-screen bg-background antialiased font-montserrat",
+          fontMontserrat.variable
+        )}
+      >
+        {children}
+      </body>
     </html>
   );
 }
