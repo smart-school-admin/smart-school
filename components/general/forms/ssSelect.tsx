@@ -17,8 +17,8 @@ export default function SSSelect(props: {
         <SelectValue placeholder={props.placeholder} />
       </SelectTrigger>
       <SelectContent>
-        {props.options.map((option) => (
-          <SelectItem value={option.value}>{option.name}</SelectItem>
+        {props.options.map((option, index) => (
+          <SelectItem key={index} value={option.value}>{option.name}</SelectItem>
         ))}
       </SelectContent>
     </Select>

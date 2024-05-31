@@ -91,6 +91,7 @@ model School {
   Student             Student[]
   Teacher             Teacher[]
   SchoolAdministrator SchoolAdministrator?
+  badgeImagePath      String
 }
 
 model Teacher {
@@ -119,6 +120,7 @@ model SchoolAdministrator {
   last_name   String
   other_names String
   email       String
+  password    String
   school      School @relation(fields: [schoolId], references: [id])
   schoolId    String @unique
   imagePath   String
