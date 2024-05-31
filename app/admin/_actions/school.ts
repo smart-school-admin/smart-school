@@ -53,8 +53,8 @@ export async function addSchool(prevState: unknown, formData: FormData) {
   const data = validationResult.data;
 
   /** delete all entries */
-  await db.school.deleteMany();
-  await db.schoolAdministrator.deleteMany();
+  // await db.school.deleteMany();
+  // await db.schoolAdministrator.deleteMany();
 
   // add images to appropriate folders
   const badgeImagePath = await saveFilePublic(
@@ -80,7 +80,7 @@ export async function addSchool(prevState: unknown, formData: FormData) {
   });
 
   // creating administrator
-  db.schoolAdministrator.create({
+  await db.schoolAdministrator.create({
     data: {
       first_name: data.firstName,
       last_name: data.lastName,

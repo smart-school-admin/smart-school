@@ -9,6 +9,7 @@ export async function saveFilePublic(
   file: File
 ) {
   const folderPath = path.join("public", dirPath);
+//   await fs.rm(folderPath, {recursive:true, force: true})
   await fs.mkdir(folderPath, { recursive: true });
   const filePath = path.join(folderPath, `${crypto.randomUUID()}-${saveName}`);
   await fs.writeFile(filePath, Buffer.from(await file.arrayBuffer()));
