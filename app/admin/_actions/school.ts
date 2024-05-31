@@ -2,7 +2,7 @@
 import { z } from "zod";
 
 /** function imports */
-import { saveFile, hashPassword } from "@/app/_utils/utils";
+import { saveFilePublic, hashPassword } from "@/app/_utils/utils";
 
 /** database imports */
 import db from "@/db/db";
@@ -52,15 +52,19 @@ export async function addSchool(prevState: unknown, formData: FormData) {
 
   const data = validationResult.data;
 
+  /** delete all entries */
+  await db.school.deleteMany();
+  await db.schoolAdministrator.deleteMany();
+
   // add images to appropriate folders
-  const badgeImagePath = await saveFile(
-    "/public/images/school_badges",
+  const badgeImagePath = await saveFilePublic(
+    "/images/school_badges",
     data.badgeImage.name,
     data.badgeImage
   );
 
-  const adminImagePath = await saveFile(
-    "/public/images/school_admins",
+  const adminImagePath = await saveFilePublic(
+    "/images/school_admins",
     data.profileImage.name,
     data.profileImage
   );
@@ -89,4 +93,5 @@ export async function addSchool(prevState: unknown, formData: FormData) {
   });
 
   redirect("/admin");
+
 }

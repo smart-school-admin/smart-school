@@ -3,9 +3,14 @@ import path from "path";
 import bcrypt from "bcrypt";
 
 /** function to save file */
-export async function saveFile(dirPath: string, saveName: string, file: File) {
-  await fs.mkdir(dirPath, { recursive: true });
-  const filePath = path.join(dirPath, `${crypto.randomUUID()}-${saveName}`);
+export async function saveFilePublic(
+  dirPath: string,
+  saveName: string,
+  file: File
+) {
+  const folderPath = path.join("public", dirPath);
+  await fs.mkdir(folderPath, { recursive: true });
+  const filePath = path.join(folderPath, `${crypto.randomUUID()}-${saveName}`);
   await fs.writeFile(filePath, Buffer.from(await file.arrayBuffer()));
   return filePath;
 }
