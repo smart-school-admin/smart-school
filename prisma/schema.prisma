@@ -16,12 +16,13 @@ datasource db {
 // MODELS
 
 model User {
-  id       Int       @id @default(autoincrement())
-  userId   String
-  username String
-  password String
-  role     USER_ROLE
-  createAt DateTime  @default(now())
+  id                  String                @id @default(uuid())
+  email               String                @unique
+  password            String
+  role                USER_ROLE
+  createAt            DateTime              @default(now())
+  SchoolAdministrator SchoolAdministrator[]
+  Teacher             Teacher[]
 }
 
 model Student {
@@ -67,7 +68,7 @@ model Student {
   region                String //
   district              String //
   course                Course               @relation(fields: [courseId], references: [id])
-  courseId              String
+  courseId              Int
   updatedAt             DateTime             @updatedAt
   imagePath             String
 }
@@ -75,7 +76,7 @@ model Student {
 model Grade {
   id          Int      @id @default(autoincrement())
   subject     Subject  @relation(fields: [subjectId], references: [id])
-  subjectId   String
+  subjectId   Int
   semester    SEMESTER
   student     Student  @relation(fields: [studentId], references: [id])
   studentId   String
@@ -84,22 +85,22 @@ model Grade {
 }
 
 model School {
-  id                  String               @id @default(uuid())
+  id                  String                @id @default(uuid())
   name                String
   region              String
   district            String
   Student             Student[]
   Teacher             Teacher[]
-  SchoolAdministrator SchoolAdministrator?
   badgeImagePath      String
+  SchoolAdministrator SchoolAdministrator?
 }
 
 model Teacher {
-  id                    String   @id @default(uuid())
+  id                    String   @id
+  user                  User     @relation(fields: [id], references: [id])
   first_name            String
   last_name             String
   other_names           String
-  email                 String
   gender                GENDER
   region                String
   district              String
@@ -109,25 +110,24 @@ model Teacher {
   school                School   @relation(fields: [schoolId], references: [id])
   schoolId              String
   subject               Subject  @relation(fields: [subjectId], references: [id])
-  subjectId             String
+  subjectId             Int
   updatedAt             DateTime @updatedAt
   imagePath             String
 }
 
 model SchoolAdministrator {
-  id          String @id @default(uuid())
+  id          String @id
+  user        User   @relation(fields: [id], references: [id])
   first_name  String
   last_name   String
   other_names String
-  email       String
-  password    String
+  imagePath   String
   school      School @relation(fields: [schoolId], references: [id])
   schoolId    String @unique
-  imagePath   String
 }
 
 model Course {
-  id        String    @id @default(uuid())
+  id        Int       @id @default(autoincrement())
   name      String
   Subject   Subject[]
   Student   Student[]
@@ -135,17 +135,17 @@ model Course {
 }
 
 model Subject {
-  id        String    @id @default(uuid())
+  id        Int       @id @default(autoincrement())
   name      String
   course    Course    @relation(fields: [courseId], references: [id])
-  courseId  String
+  courseId  Int
   Grade     Grade[]
   Teacher   Teacher[]
   updatedAt DateTime  @updatedAt
 }
 
 model Attendance {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
   date      DateTime @default(now())
   present   Boolean
   semester  Int

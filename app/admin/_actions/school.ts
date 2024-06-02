@@ -8,6 +8,9 @@ import { saveFilePublic, hashPassword } from "@/app/_utils/utils";
 import db from "@/db/db";
 import { redirect } from "next/navigation";
 
+/** types */
+import { USER_ROLE } from "@prisma/client";
+
 const requiredMessage = "This field is required";
 const fileSizeMessage = "File must be less than 10mb";
 const fileSchema = z.instanceof(File, { message: requiredMessage });
@@ -55,6 +58,7 @@ export async function addSchool(prevState: unknown, formData: FormData) {
   /** delete all entries */
   // await db.school.deleteMany();
   // await db.schoolAdministrator.deleteMany();
+  // await db.user.deleteMany()
 
   // add images to appropriate folders
   const badgeImagePath = await saveFilePublic(
@@ -79,14 +83,22 @@ export async function addSchool(prevState: unknown, formData: FormData) {
     },
   });
 
+  // creating user
+  const user = await db.user.create({
+    data:{
+      email: data.email,
+      password: hashPassword(data.password),
+      role: USER_ROLE.admin
+    }
+  })
+
   // creating administrator
   await db.schoolAdministrator.create({
     data: {
+      id: user.id,
       first_name: data.firstName,
       last_name: data.lastName,
       other_names: data.otherNames ? data.otherNames : "",
-      email: data.email,
-      password: hashPassword(data.password),
       schoolId: school.id,
       imagePath: adminImagePath,
     },
