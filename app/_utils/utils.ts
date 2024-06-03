@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs"
 
 /** function to save file */
 export async function saveFilePublic(

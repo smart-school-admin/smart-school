@@ -73,4 +73,12 @@
     body {
       @apply bg-background text-foreground;
     }
+    *::-webkit-scrollbar{
+      @apply bg-gray-500;
+      width: 0.25rem;
+      height: 0.25rem;
+    }
+    *::-webkit-scrollbar-thumb{
+      @apply bg-ssPrimary-100
+    }
   }

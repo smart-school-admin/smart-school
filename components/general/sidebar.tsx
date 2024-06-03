@@ -17,11 +17,11 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        "h-screen max-w-72 w-full py-4 shadow-sm shadow-gray-600",
+        "h-screen max-w-72 w-full py-4 shadow-sm shadow-gray-600 bg-black text-white",
         className
       )}
     >
-      <h1 className="text-center text-2xl font-semibold mb-8">Title</h1>
+      <h1 className="text-center text-2xl font-semibold mb-8">Smart School</h1>
       <div className="flex flex-col gap-2 px-4">{children}</div>
     </aside>
   );
@@ -32,9 +32,9 @@ export function SidebarItem(props: ComponentProps<typeof Link>) {
     <Link
       href={props.href}
       className={cn(
-        "w-100 p-2 rounded-sm hover:bg-gray-200 text-sm flex gap-2 items-center",
+        "w-100 p-2 rounded-sm hover:text-ssPrimary-100 text-sm flex gap-2 items-center transition-colors",
         props.className,
-        usePathname() == props.href && "bg-ssPrimary-100 font-semibold text-ssPrimary-foreground"
+        usePathname() == props.href && "bg-ssPrimary-100 font-semibold text-ssPrimary-foreground hover:text-white"
       )}
     >
       {props.children}
