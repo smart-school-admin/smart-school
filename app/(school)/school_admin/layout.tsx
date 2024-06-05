@@ -20,12 +20,12 @@ export default function RootLayout({
           <LayoutDashboardIcon /> Dashboard
         </SidebarItem>
         <SidebarItem href="/school_admin/students">
-          <BookUserIcon /> Teachers
+          <BookUserIcon /> Students
         </SidebarItem>
-        <SidebarItem href="/school_admin/students">
-          <GraduationCapIcon /> Students
+        <SidebarItem href="/school_admin/teachers">
+          <GraduationCapIcon /> Teachers
         </SidebarItem>
-        <SidebarItem href="/school_admin/students" className="text-red-500">
+        <SidebarItem href="#" className="text-red-500">
           <LogOutIcon /> Logout
         </SidebarItem>
       </Sidebar>
