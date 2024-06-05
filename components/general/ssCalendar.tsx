@@ -4,7 +4,9 @@ import * as React from "react"
 
 import { Calendar } from "@/components/ui/calendar"
 
-export default function SSCalendar() {
+import { cn } from "@/lib/utils"
+
+export default function SSCalendar({className}: {className: string}) {
   const [date, setDate] = React.useState<Date | undefined>(new Date())
 
   return (
@@ -12,7 +14,7 @@ export default function SSCalendar() {
       mode="single"
       selected={date}
       onSelect={setDate}
-      className="rounded-md border shadow"
+      className={cn("rounded-md border shadow", className)}
     />
   )
 }

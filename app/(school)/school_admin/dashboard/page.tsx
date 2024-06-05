@@ -1,8 +1,9 @@
-/** component cards */
+/** component imports */
 import StatCard from "../../_components/cards/statCard";
 import SSCalendar from "@/components/general/ssCalendar";
 import { Card } from "@/components/ui/card";
-import AttendanceAndEvents from "./attendanceAndEvents";
+import AttendanceAndEvents from "./_components/attendanceAndEvents";
+import FinanceChart from "./_components/financeChart";
 
 /** icon imports */
 import { GraduationCapIcon } from "lucide-react";
@@ -11,10 +12,10 @@ import { BookMarkedIcon } from "lucide-react";
 
 export default function SchoolAdminDashboardPage() {
   return (
-    <div className="w-full">
-      <h1 className="text-2xl font-semibold">Dashboard</h1>
-      <div className="grid grid-cols-3 my-4 gap-2">
-        <div className="col-span-2">
+    <div className="w-full min-h-full">
+      <h1 className="text-2xl font-semibold mb-8">Dashboard</h1>
+      <div className="flex gap-4 flex-wrap">
+        <div className="w-2/3 flex flex-col flex-1 justify-between">
           <div className="grid grid-cols-3 gap-2">
             <StatCard>
               <div className="flex items-center justify-center text-2xl gap-2 py-2">
@@ -40,12 +41,19 @@ export default function SchoolAdminDashboardPage() {
               </div>
             </StatCard>
           </div>
+          <Card>
+            <div className="w-full h-[450px]">
+              <FinanceChart />
+            </div>
+          </Card>
         </div>
-        <div>
-          <AttendanceAndEvents/>
-        </div>
-        <div className="flex justify-center">
-          <SSCalendar />
+        <div className="flex flex-col gap-8">
+          <div>
+            <AttendanceAndEvents />
+          </div>
+          <div className="flex justify-center w-full">
+            <SSCalendar className="w-full" />
+          </div>
         </div>
       </div>
     </div>

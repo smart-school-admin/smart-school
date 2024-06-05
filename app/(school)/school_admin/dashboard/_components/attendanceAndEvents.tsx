@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import StatCard from "../../_components/cards/statCard";
+import StatCard from "@/app/(school)/_components/cards/statCard";
 import Link from "next/link";
 
 /** icon imports */
