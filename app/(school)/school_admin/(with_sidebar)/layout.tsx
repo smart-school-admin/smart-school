@@ -1,6 +1,6 @@
 /** component imports */
 import { Sidebar, SidebarItem } from "@/components/general/sidebar";
-import Navbar from "./_components/navbar";
+import Navbar from "../_components/navbar";
 
 /** icon imports */
 import { LayoutDashboardIcon } from "lucide-react";

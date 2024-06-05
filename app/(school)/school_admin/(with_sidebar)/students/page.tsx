@@ -2,7 +2,7 @@
 import Link from "next/link";
 
 /** component imports */
-import StudentCard from "../../_components/cards/studentCard";
+import StudentCard from "@/app/(school)/_components/cards/studentCard";
 import { Button } from "@/components/ui/button";
 
 /** icon imports */
@@ -13,7 +13,7 @@ export default function StudentsPage() {
     <div className="w-full min-h-full">
       <h1 className="text-2xl font-semibold mb-8  mt-4 flex justify-between">
         Students
-        <Link href="#">
+        <Link href="/school_admin/add/student">
           <Button>
             <PlusIcon /> New Student
           </Button>

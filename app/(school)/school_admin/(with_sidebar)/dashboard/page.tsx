@@ -1,5 +1,5 @@
 /** component imports */
-import StatCard from "../../_components/cards/statCard";
+import StatCard from "@/app/(school)/_components/cards/statCard";
 import SSCalendar from "@/components/general/ssCalendar";
 import { Card } from "@/components/ui/card";
 import AttendanceAndEvents from "./_components/attendanceAndEvents";
