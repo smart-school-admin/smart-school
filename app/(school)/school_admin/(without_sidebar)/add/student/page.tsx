@@ -1,7 +1,6 @@
 /** component imports */
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import FileUpload from "@/components/general/fileUpload";
-import SubmitButton from "@/components/general/forms/submitButton";
+import AddMultipleStudentsForm from "./_components/addMultipleStudentsForm";
 
 export default function AddStudentPage() {
   return (
@@ -17,10 +16,7 @@ export default function AddStudentPage() {
         </TabsList>
         <TabsContent value="single">Upload Single Student</TabsContent>
         <TabsContent value="multiple">
-          <form className="flex flex-col gap-4">
-            <FileUpload />
-            <SubmitButton className="py-4"/>
-          </form>
+          <AddMultipleStudentsForm/>
         </TabsContent>
       </Tabs>
     </div>
