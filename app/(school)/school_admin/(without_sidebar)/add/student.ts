@@ -1,6 +1,6 @@
 "use server";
 
-import * as fs from 'fs';
+import * as fs from "fs";
 
 /** schema imports */
 import { csvFileSchema } from "@/lib/schemas";
@@ -9,7 +9,8 @@ import { csvFileSchema } from "@/lib/schemas";
 import db from "@/db/db";
 
 /** for parsing */
-import { parseStream } from "fast-csv";
+import papa from "papaparse";
+import { parseStream, parseString } from "fast-csv";
 
 export default async function addStudentsFromFile(
   prevState: unknown,
@@ -23,13 +24,21 @@ export default async function addStudentsFromFile(
     return validationResult.error?.errors[0].message;
   }
 
-  // return {}
 
-  // read csv file and update the students database
-  // parseStream(stream)
-  // .on('error', error => console.error(error))
-  // .on('data', row => console.log(row))
-  // .on('end', (rowCount: number) => console.log(`Parsed ${rowCount} rows`));
+  const data = await getRows(validationResult.data);
+  console.log(data)
 
   return {};
+}
+
+async function getRows(file: File) {
+  const textData = await file.text();
+  return new Promise((resolve, reject) => {
+    let result: { [key: string]: any }[] = [];
+    parseString(textData, { headers: true })
+      .on("data", (row) => result.push(row))
+      .on("end", () => resolve(result));
+  }).catch((err) => {
+    throw err;
+  });
 }
