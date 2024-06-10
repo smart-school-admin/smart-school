@@ -28,18 +28,25 @@ export default async function addStudentsFromFile(
   // const session = await Session(authConfig);
   // console.log(session)
 
-  console.log(await auth());
-  // const data = await getRows(validationResult.data) as Student[];
+  const session = await auth();
 
-  // getting the school id
-  // const schoolId = db.sc
-  
-  // try{
-  //   await db.student.createMany({data: data})
-  // }
-  // catch(error:any){
-  //   console.log(error)
-  // }
+  if (!session || !session.user || !session.user.email) {
+    return;
+  }
+
+  const user = await db.user.findUnique({
+    where: { email: session?.user?.email! },
+    select: { id: true },
+  });
+
+  if (!user) return;
+  const admin = await db.schoolAdministrator.findUnique({
+    where: { id: user.id },
+    select: { schoolId: true },
+  });
+
+  console.log(admin)
+
 
   return {};
 }

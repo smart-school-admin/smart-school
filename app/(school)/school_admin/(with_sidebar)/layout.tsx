@@ -1,12 +1,16 @@
 /** component imports */
 import { Sidebar, SidebarItem } from "@/components/general/sidebar";
 import Navbar from "../_components/navbar";
+import LogoutSidebarItem from "../_components/logoutSidebarItem";
 
 /** icon imports */
 import { LayoutDashboardIcon } from "lucide-react";
 import { GraduationCapIcon } from "lucide-react";
 import { BookUserIcon } from "lucide-react";
 import { LogOutIcon } from "lucide-react";
+
+/** server action imports */
+import { signOut } from "@/auth";
 
 export default function RootLayout({
   children,
@@ -25,9 +29,7 @@ export default function RootLayout({
         <SidebarItem href="/school_admin/teachers">
           <GraduationCapIcon /> Teachers
         </SidebarItem>
-        <SidebarItem href="#" className="text-red-500">
-          <LogOutIcon /> Logout
-        </SidebarItem>
+        <LogoutSidebarItem/>
       </Sidebar>
       <div className="h-full flex-grow flex flex-col">
         <Navbar />

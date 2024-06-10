@@ -14,7 +14,7 @@ import SubmitButton from "@/components/general/forms/submitButton";
 import { cn } from "@/lib/utils";
 import { ChangeEvent } from "react";
 
-import addStudentsFromFile from "../../student";
+import addStudentsFromFile from "../../../../_actions/student";
 
 export default function AddMultipleStudentsForm({
   className,
