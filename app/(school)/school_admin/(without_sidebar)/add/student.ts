@@ -1,6 +1,7 @@
 "use server";
 
 import * as fs from "fs";
+import { auth } from "@/auth";
 
 /** schema imports */
 import { csvFileSchema } from "@/lib/schemas";
@@ -9,8 +10,8 @@ import { csvFileSchema } from "@/lib/schemas";
 import db from "@/db/db";
 
 /** for parsing */
-import papa from "papaparse";
 import { parseStream, parseString } from "fast-csv";
+import { Student } from "@prisma/client";
 
 export default async function addStudentsFromFile(
   prevState: unknown,
@@ -24,9 +25,21 @@ export default async function addStudentsFromFile(
     return validationResult.error?.errors[0].message;
   }
 
+  // const session = await Session(authConfig);
+  // console.log(session)
 
-  const data = await getRows(validationResult.data);
-  console.log(data)
+  console.log(await auth());
+  // const data = await getRows(validationResult.data) as Student[];
+
+  // getting the school id
+  // const schoolId = db.sc
+  
+  // try{
+  //   await db.student.createMany({data: data})
+  // }
+  // catch(error:any){
+  //   console.log(error)
+  // }
 
   return {};
 }
