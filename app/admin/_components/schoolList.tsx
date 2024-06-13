@@ -8,6 +8,7 @@ interface SchoolCardProps extends React.HTMLProps<Element> {
   name: string;
   region: string;
   district: string;
+  badgeImagePath: string;
 }
 
 export const SchoolCard: React.FC<SchoolCardProps> = (props) => {
@@ -15,7 +16,7 @@ export const SchoolCard: React.FC<SchoolCardProps> = (props) => {
     <div className="shadow-neutral-500 shadow-sm p-4 rounded-sm flex flex-col gap-8">
       <div className="flex items-center gap-4">
         <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" />
+          <AvatarImage src={props.badgeImagePath} />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div>

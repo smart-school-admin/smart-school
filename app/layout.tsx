@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 /** shadcn */
 import { cn } from "@/lib/utils";
@@ -29,7 +30,8 @@ export default function RootLayout({
           fontMontserrat.variable
         )}
       >
-        {children}
+        <main>{children}</main>
+        <Toaster/>
       </body>
     </html>
   );

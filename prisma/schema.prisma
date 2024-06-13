@@ -27,7 +27,7 @@ model User {
 
 model Student {
   id                    String               @id @default(uuid())
-  index_number          Int
+  index_number          Int                  @unique
   first_name            String
   last_name             String
   other_names           String
@@ -61,7 +61,6 @@ model Student {
   free_time             Int
   social                Int
   absences              Int
-  math_intensive        Boolean
   time_registered       DateTime             @default(now()) //
   Attendance            Attendance[]
   Grade                 Grade[]
@@ -70,7 +69,7 @@ model Student {
   course                Course               @relation(fields: [courseId], references: [id])
   courseId              Int
   updatedAt             DateTime             @updatedAt
-  imagePath             String
+  imagePath             String?
 }
 
 model Grade {
@@ -85,7 +84,7 @@ model Grade {
 }
 
 model School {
-  id                  String                @id @default(uuid())
+  id                  String               @id @default(uuid())
   name                String
   region              String
   district            String
@@ -135,13 +134,14 @@ model Course {
 }
 
 model Subject {
-  id        Int       @id @default(autoincrement())
-  name      String
-  course    Course    @relation(fields: [courseId], references: [id])
-  courseId  Int
-  Grade     Grade[]
-  Teacher   Teacher[]
-  updatedAt DateTime  @updatedAt
+  id             Int       @id @default(autoincrement())
+  name           String
+  course         Course    @relation(fields: [courseId], references: [id])
+  courseId       Int
+  math_intensive Boolean
+  Grade          Grade[]
+  Teacher        Teacher[]
+  updatedAt      DateTime  @updatedAt
 }
 
 model Attendance {

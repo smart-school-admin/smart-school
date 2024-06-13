@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
-import bcrypt from "bcryptjs"
+import bcrypt from "bcryptjs";
 
 /** function to save file */
 export async function saveFilePublic(
@@ -9,11 +9,11 @@ export async function saveFilePublic(
   file: File
 ) {
   const folderPath = path.join("public", dirPath);
-//   await fs.rm(folderPath, {recursive:true, force: true})
   await fs.mkdir(folderPath, { recursive: true });
-  const filePath = path.join(folderPath, `${crypto.randomUUID()}-${saveName}`);
+  const fileName = `${crypto.randomUUID()}-${saveName}`;
+  const filePath = path.join(folderPath, fileName);
   await fs.writeFile(filePath, Buffer.from(await file.arrayBuffer()));
-  return filePath;
+  return path.join(dirPath, fileName);
 }
 
 /** function to hash password */

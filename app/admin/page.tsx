@@ -10,6 +10,9 @@ import SchoolForm from "./_components/schoolForm";
 /** icon imports */
 import { PlusIcon } from "lucide-react";
 
+/** database imports */
+import db from "@/db/db";
+
 const fakeSchools = [
   {
     name: "Great School",
@@ -17,7 +20,8 @@ const fakeSchools = [
     district: "Adenta",
   },
 ];
-export default function AdminHomePage() {
+export default async function AdminHomePage() {
+  const schools = await db.school.findMany();
   return (
     <>
       <div className="flex justify-end mb-8 w-full">
@@ -28,15 +32,17 @@ export default function AdminHomePage() {
             </Button>
           </DialogTrigger>
           <SSDialog title="Add School">
-            <SchoolForm/>
+            <SchoolForm />
           </SSDialog>
         </Dialog>
       </div>
-      <SchoolList>
-        {fakeSchools.map((school, index) => (
-          <SchoolCard key={index}  {...school} />
-        ))}
-      </SchoolList>
+      {schools && schools.length > 0 && (
+        <SchoolList>
+          {schools.map((school, index) => (
+            <SchoolCard key={index} {...school} />
+          ))}
+        </SchoolList>
+      )}
     </>
   );
 }

@@ -49,16 +49,24 @@ export async function addSchool(prevState: unknown, formData: FormData) {
     Object.fromEntries(formData.entries())
   );
 
+  /** delete all entries */
+  // await db.schoolAdministrator.deleteMany();
+  // await db.school.deleteMany();
+  // await db.user.deleteMany()
+
   if (!validationResult.success) {
     return validationResult.error.formErrors.fieldErrors;
   }
 
+
   const data = validationResult.data;
 
-  /** delete all entries */
-  // await db.school.deleteMany();
-  // await db.schoolAdministrator.deleteMany();
-  // await db.user.deleteMany()
+
+  // checking if user with that email exists
+  const exists = !!(await db.user.findUnique({ where: { email: data.email } }));
+  if (exists) return { errorMessage: "user already exists" };
+
+
 
   // add images to appropriate folders
   const badgeImagePath = await saveFilePublic(
@@ -85,12 +93,12 @@ export async function addSchool(prevState: unknown, formData: FormData) {
 
   // creating user
   const user = await db.user.create({
-    data:{
+    data: {
       email: data.email,
       password: hashPassword(data.password),
-      role: USER_ROLE.admin
-    }
-  })
+      role: USER_ROLE.schoolAdmin,
+    },
+  });
 
   // creating administrator
   await db.schoolAdministrator.create({
@@ -105,5 +113,4 @@ export async function addSchool(prevState: unknown, formData: FormData) {
   });
 
   redirect("/admin");
-
 }

@@ -25,9 +25,6 @@ export default async function addStudentsFromFile(
     return validationResult.error?.errors[0].message;
   }
 
-  // const session = await Session(authConfig);
-  // console.log(session)
-
   const session = await auth();
 
   if (!session || !session.user || !session.user.email) {
@@ -45,8 +42,12 @@ export default async function addStudentsFromFile(
     select: { schoolId: true },
   });
 
-  console.log(admin)
+  const schoolId = admin?.schoolId;
+  let students = (await getRows(validationResult.data)) as Student[];
+  students = students.map((student) => ({ ...student, schoolId: schoolId! }));
 
+  // adding the students
+  await db.student.createMany({ data: students });
 
   return {};
 }
