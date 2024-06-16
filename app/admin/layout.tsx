@@ -5,7 +5,7 @@ import { Metadata } from "next";
 import { Sidebar, SidebarItem } from "@/components/general/sidebar";
 
 /** icon imports */
-import { SchoolIcon } from "lucide-react";
+import { SchoolIcon, BookIcon } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Admin | Dashboard",
@@ -20,7 +20,8 @@ export default function AdminDashboardLayout({
     <section className="min-h-full flex">
       <Sidebar >
         <SidebarItem href="/admin"><SchoolIcon/> Schools</SidebarItem>
-        <SidebarItem href="/second">Second thing</SidebarItem>
+        <SidebarItem href="/admin/subjects"><BookIcon/> Subjects</SidebarItem>
+        <SidebarItem href="/admin/courses"><BookIcon/> Courses</SidebarItem>
       </Sidebar>
       <div className="flex-grow p-4">{children}</div>
     </section>

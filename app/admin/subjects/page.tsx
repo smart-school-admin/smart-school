@@ -2,16 +2,8 @@
 import { Button } from "@/components/ui/button";
 import SSDialog from "@/components/general/ssDialog";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import CourseForm from "./_components/courseForm";
-import { CourseList, CourseCard } from "./_components/courseList";
-
-const courses = [
-  {
-    name: "General Science",
-    code: "GS1",
-    subjects: ["Physics", "Elective Mathematics", "Chemistry"],
-  },
-];
+import { SubjectList, SubjectCard } from "./_components/subjectList";
+import SubjectForm from "./_components/subjectForm";
 
 /** icon imports */
 import { PlusIcon } from "lucide-react";
@@ -19,7 +11,13 @@ import { PlusIcon } from "lucide-react";
 //db
 import db from "@/db/db";
 
-export default async function AdminCoursesPage() {
+// subjects
+// const subjects = [
+//   { subjectCode: "MA1", subjectName: "Core Mathematics" },
+//   { subjectCode: "LA1", subjectName: "Language" },
+// ];
+
+export default async function AdminSubjectsPage() {
   const subjects = await db.subject.findMany();
   return (
     <>
@@ -27,20 +25,20 @@ export default async function AdminCoursesPage() {
         <Dialog>
           <DialogTrigger asChild>
             <Button>
-              <PlusIcon /> Add Course
+              <PlusIcon /> Add Subject
             </Button>
           </DialogTrigger>
-          <SSDialog title="Add Course">
-            <CourseForm />
+          <SSDialog title="Add Subject">
+            <SubjectForm />
           </SSDialog>
         </Dialog>
       </div>
       <div>
-        <CourseList>
-          {courses.map((course, index) => (
-            <CourseCard key={index} {...course} />
+        <SubjectList>
+          {subjects.map((subject, index) => (
+            <SubjectCard key={index} {...subject} />
           ))}
-        </CourseList>
+        </SubjectList>
       </div>
     </>
   );

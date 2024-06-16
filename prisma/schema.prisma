@@ -128,20 +128,21 @@ model SchoolAdministrator {
 model Course {
   id        Int       @id @default(autoincrement())
   name      String
-  Subject   Subject[]
   Student   Student[]
+  subjects  Subject[]
   updatedAt DateTime  @updatedAt
 }
 
 model Subject {
   id             Int       @id @default(autoincrement())
+  code           String    @unique
   name           String
-  course         Course    @relation(fields: [courseId], references: [id])
-  courseId       Int
   math_intensive Boolean
   Grade          Grade[]
   Teacher        Teacher[]
   updatedAt      DateTime  @updatedAt
+  Course         Course?   @relation(fields: [courseId], references: [id])
+  courseId       Int?
 }
 
 model Attendance {

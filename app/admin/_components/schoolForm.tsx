@@ -126,9 +126,6 @@ export default function SchoolForm() {
         </div>
       </div>
       <SubmitButton />
-      {errors && "errorMessge" in errors && (
-        <FormError>{errors.errorMessge! as string}</FormError>
-      )}
     </form>
   );
 }
