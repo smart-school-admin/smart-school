@@ -15,13 +15,23 @@ export async function createCourse(data: {
   code: string;
   subjects: string[];
 }) {
-    const validationResult = courseSchema.safeParse(data);
+  const validationResult = courseSchema.safeParse(data);
 
-    if(!validationResult.success)
-        return validationResult.error.formErrors.fieldErrors;
+  if (!validationResult.success)
+    return validationResult.error.formErrors.fieldErrors;
 
-    // check if course code already exists
-    // const exists = !!(await db.course.findUnique({where: {code: validationResult.code}}))
+  // check if course code already exists
+  // const exists = !!(await db.course.findUnique({where: {code: validationResult.code}}))
 
-    // db.course.create({data: validationResult.data})
+  // db.course.create({data: validationResult.data})
+}
+
+export async function getAllSubjects() {
+  return await db.subject.findMany({
+    select: {
+      id: true,
+      code: true,
+      name: true,
+    },
+  });
 }

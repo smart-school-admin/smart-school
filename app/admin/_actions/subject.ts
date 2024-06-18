@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 import { object, z } from "zod";
 import db from "@/db/db";
@@ -33,3 +33,4 @@ export default async function createSubject(
   // inserts
   await db.subject.create({ data: validationResult.data });
 }
+

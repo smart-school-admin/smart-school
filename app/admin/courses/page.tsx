@@ -4,6 +4,7 @@ import SSDialog from "@/components/general/ssDialog";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import CourseForm from "./_components/courseForm";
 import { CourseList, CourseCard } from "./_components/courseList";
+import { getAllSubjects } from "../_actions/course";
 
 const courses = [
   {
@@ -20,7 +21,7 @@ import { PlusIcon } from "lucide-react";
 import db from "@/db/db";
 
 export default async function AdminCoursesPage() {
-  const subjects = await db.subject.findMany();
+  const subjects = await getAllSubjects()
   return (
     <>
       <div className="flex justify-end mb-8 w-full">
@@ -31,7 +32,7 @@ export default async function AdminCoursesPage() {
             </Button>
           </DialogTrigger>
           <SSDialog title="Add Course">
-            <CourseForm />
+            <CourseForm subjects={subjects} />
           </SSDialog>
         </Dialog>
       </div>
