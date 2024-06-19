@@ -126,11 +126,13 @@ model SchoolAdministrator {
 }
 
 model Course {
+  code      String    @unique
   id        Int       @id @default(autoincrement())
   name      String
   Student   Student[]
   subjects  Subject[]
   updatedAt DateTime  @updatedAt
+  createdAt DateTime  @default(now())
 }
 
 model Subject {
@@ -141,8 +143,8 @@ model Subject {
   Grade          Grade[]
   Teacher        Teacher[]
   updatedAt      DateTime  @updatedAt
-  Course         Course?   @relation(fields: [courseId], references: [id])
-  courseId       Int?
+  Course         Course[]
+  createdAt      DateTime  @default(now())
 }
 
 model Attendance {

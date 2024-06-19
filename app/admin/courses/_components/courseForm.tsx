@@ -15,20 +15,23 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from "@/components/ui/multi-select";
+import { toast } from "sonner";
 
-import { createCourse, getAllSubjects } from "../../_actions/course";
-import db from "@/db/db";
+import { createCourse } from "../../_actions/course";
 
 export default function CourseForm({
   subjects,
 }: {
   subjects?: { id: number; code: string; name: string }[];
 }) {
-  // const [subjects, setSubjects] = useState<
-  //   { id: number; code: string; name: string }[]
-  // >([]);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [errors, setErrors] = useState<any>();
+  if(errors && "errorMessage" in errors){
+    toast.error(errors.errorMessage);
+    setErrors(null);
+  }
+
+
   const action = async (formData: FormData) => {
     const data = {
       code: formData.get("code") as string,
@@ -67,7 +70,7 @@ export default function CourseForm({
             <MultiSelectorList>
               {subjects &&
                 subjects.map((subject, index) => (
-                  <MultiSelectorItem value={subject.id.toString()}>
+                  <MultiSelectorItem key={index} value={subject.id.toString()} >
                     {subject.code}-{subject.name}
                   </MultiSelectorItem>
                 ))}

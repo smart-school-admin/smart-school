@@ -9,7 +9,7 @@ import {
 import React from "react";
 
 export function CourseList({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-3">{children}</div>;
+  return <div className="grid grid-cols-3 gap-4">{children}</div>;
 }
 
 export function CourseCard({
@@ -32,7 +32,7 @@ export function CourseCard({
           <HoverCardContent>
             <ul>
               {subjects.map((subject, index) => (
-                <li key={index}>{subject}</li>
+                <li className="text-xs flex flex-col gap-4" key={index}>{subject}</li>
               ))}
             </ul>
           </HoverCardContent>

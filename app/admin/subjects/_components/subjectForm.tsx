@@ -16,7 +16,6 @@ import createSubject from "../../_actions/subject";
 export default function SubjectForm() {
   const [errors, action] = useFormState(createSubject, {});
   if(errors && "errorMessage" in errors){
-    console.log("here")
     toast.error(errors.errorMessage);
   }
   return (

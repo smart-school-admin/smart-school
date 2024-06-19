@@ -1,6 +1,7 @@
 /** component imports */
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AddMultipleStudentsForm from "./_components/addMultipleStudentsForm";
+import StudentForm from "./_components/studentForm";
 
 export default function AddStudentPage() {
   return (
@@ -14,7 +15,9 @@ export default function AddStudentPage() {
             Multiple
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="single">Upload Single Student</TabsContent>
+        <TabsContent value="single">
+          <StudentForm/>
+        </TabsContent>
         <TabsContent value="multiple">
           <AddMultipleStudentsForm/>
         </TabsContent>

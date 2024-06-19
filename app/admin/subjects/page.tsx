@@ -11,11 +11,6 @@ import { PlusIcon } from "lucide-react";
 //db
 import db from "@/db/db";
 
-// subjects
-// const subjects = [
-//   { subjectCode: "MA1", subjectName: "Core Mathematics" },
-//   { subjectCode: "LA1", subjectName: "Language" },
-// ];
 
 export default async function AdminSubjectsPage() {
   const subjects = await db.subject.findMany();

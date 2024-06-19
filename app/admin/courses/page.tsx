@@ -6,13 +6,6 @@ import CourseForm from "./_components/courseForm";
 import { CourseList, CourseCard } from "./_components/courseList";
 import { getAllSubjects } from "../_actions/course";
 
-const courses = [
-  {
-    name: "General Science",
-    code: "GS1",
-    subjects: ["Physics", "Elective Mathematics", "Chemistry"],
-  },
-];
 
 /** icon imports */
 import { PlusIcon } from "lucide-react";
@@ -21,7 +14,10 @@ import { PlusIcon } from "lucide-react";
 import db from "@/db/db";
 
 export default async function AdminCoursesPage() {
-  const subjects = await getAllSubjects()
+  const courses = await db.course.findMany({
+    select: { code: true, name: true, subjects: true },
+  });
+  const subjects = await getAllSubjects();
   return (
     <>
       <div className="flex justify-end mb-8 w-full">
@@ -39,7 +35,14 @@ export default async function AdminCoursesPage() {
       <div>
         <CourseList>
           {courses.map((course, index) => (
-            <CourseCard key={index} {...course} />
+            <CourseCard
+              key={index}
+              code={course.code}
+              name={course.name}
+              subjects={course.subjects.map(
+                (subject) => `${subject.code}-${subject.name}`
+              )}
+            />
           ))}
         </CourseList>
       </div>
