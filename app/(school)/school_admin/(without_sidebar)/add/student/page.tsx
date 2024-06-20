@@ -2,8 +2,16 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AddMultipleStudentsForm from "./_components/addMultipleStudentsForm";
 import StudentForm from "./_components/studentForm";
+import db from "@/db/db";
 
-export default function AddStudentPage() {
+export default async function AddStudentPage() {
+  const schools = await db.school.findMany({
+    select: { id: true, name: true },
+  });
+  const courses = await db.course.findMany({
+    select: { id: true, code: true, name: true },
+  });
+
   return (
     <div className="w-full max-w-3xl">
       <Tabs defaultValue="single" className="w-fill">
@@ -16,10 +24,10 @@ export default function AddStudentPage() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="single">
-          <StudentForm/>
+          <StudentForm schools={schools} courses={courses} />
         </TabsContent>
         <TabsContent value="multiple">
-          <AddMultipleStudentsForm/>
+          <AddMultipleStudentsForm />
         </TabsContent>
       </Tabs>
     </div>

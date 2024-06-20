@@ -33,18 +33,18 @@ model Student {
   other_names           String
   age                   Int
   dob                   DateTime //
-  School                School               @relation(fields: [schoolId], references: [id]) //
-  schoolId              String
   gender                GENDER
-  year                  Int //
+  School                School               @relation(fields: [schoolId], references: [id]) //
   family_size           FAMILY_SIZE
   parent_status         PARENT_STATUS
   mother_education      String
   father_education      String
   mother_job            JOB
   father_job            JOB
-  school_choice_reason  SCHOOL_CHOICE_REASON
   guardian              GUARDIAN
+  school_choice_reason  SCHOOL_CHOICE_REASON
+  schoolId              String
+  year                  Int //
   travel_time           TRAVEL_TIME
   study_time            WEEKLY_STUDY_TIME
   class_failures        Int
