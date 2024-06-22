@@ -8,7 +8,7 @@ import {
 
 export default function SSSelect(props: {
   placeholder?: string;
-  options: { name: string; value: string }[];
+  options: { name: string; value: string}[];
   name?: string;
 }) {
   return (

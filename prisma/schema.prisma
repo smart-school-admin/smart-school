@@ -28,39 +28,39 @@ model User {
 model Student {
   id                    String               @id @default(uuid())
   index_number          Int                  @unique
-  first_name            String
-  last_name             String
-  other_names           String
-  age                   Int
+  first_name            String //
+  last_name             String //
+  other_names           String //
+  age                   Int //
   dob                   DateTime //
-  gender                GENDER
-  School                School               @relation(fields: [schoolId], references: [id]) //
-  family_size           FAMILY_SIZE
-  parent_status         PARENT_STATUS
-  mother_education      String
-  father_education      String
-  mother_job            JOB
-  father_job            JOB
-  guardian              GUARDIAN
-  school_choice_reason  SCHOOL_CHOICE_REASON
+  gender                GENDER //
+  address_type          ADDRESS_TYPE //
+  family_size           FAMILY_SIZE //
+  parent_status         PARENT_STATUS //
+  mother_education      EDUCATION //
+  father_education      EDUCATION //
+  mother_job            JOB //
+  father_job            JOB //
+  family_relationship   Int //
+  guardian              GUARDIAN //
   schoolId              String
+  School                School               @relation(fields: [schoolId], references: [id])
   year                  Int //
-  travel_time           TRAVEL_TIME
+  travel_time           TRAVEL_TIME //
+  school_choice_reason  SCHOOL_CHOICE_REASON //
   study_time            WEEKLY_STUDY_TIME
-  class_failures        Int
-  school_support        Boolean
-  family_support        Boolean
-  address_type          ADDRESS_TYPE
-  extra_paid_classes    Boolean
-  activities            Boolean
-  nursery_school        Boolean
-  higher_ed             Boolean
-  internet_access       Boolean
-  romantic_relationship Boolean
-  family_relationship   Int
-  free_time             Int
+  class_failures        Int                  @default(0)
+  school_support        Boolean //
+  family_support        Boolean //
+  extra_paid_classes    Boolean //
+  activities            Boolean //
+  nursery_school        Boolean //
+  higher_ed             Boolean //
+  internet_access       Boolean //
+  romantic_relationship Boolean //
+  free_time             Int //
   social                Int
-  absences              Int
+  absences              Int                  @default(0)
   time_registered       DateTime             @default(now()) //
   Attendance            Attendance[]
   Grade                 Grade[]
