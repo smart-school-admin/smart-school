@@ -9,6 +9,7 @@ import SSSelect from "@/components/general/forms/ssSelect";
 import DateInput from "@/components/general/forms/dateInput";
 import SubmitButton from "@/components/general/forms/submitButton";
 import { objectToOptions } from "@/lib/utils";
+import { ProfileImageUpload } from "@/components/general/forms/imageUpload";
 
 /** prisma imports */
 import {
@@ -32,6 +33,12 @@ export default function StudentForm({
 }) {
   return (
     <form className="py-4 flex flex-col gap-8 w-full">
+      {/************ PROFILE IMAGE [start]****************/}
+      <div className="w-full flex justify-center py-4 flex-col items-center gap-4">
+        Student Image
+        <ProfileImageUpload name="image" />
+      </div>
+      {/************ PROFILE IMAGE [end]****************/}
       {/************ PERSONAL INFORMATION [start]****************/}
       <div className="w-full py-4 flex flex-col gap-4">
         <h2 className="font-semibold">Personal Information</h2>
@@ -250,7 +257,8 @@ export default function StudentForm({
           </div>
           <div>
             <Label>
-              Free Time <small>(On a scale of 1 to 5, how social are you)</small>
+              Free Time{" "}
+              <small>(On a scale of 1 to 5, how social are you)</small>
             </Label>
             <Input type="number" name="free_time" min={1} max={5} />
           </div>
