@@ -27,7 +27,7 @@ import { Student } from "@prisma/client";
 import { z } from "zod";
 
 const requiredMessage = "This field is required";
-const validMessage = "Please select valid vlaue";
+const validMessage = "Please select valid value";
 /** schema for student data */
 const studentSchema = z.object({
   // image
@@ -101,10 +101,13 @@ const studentSchema = z.object({
     .string()
     .min(1, { message: requiredMessage })
     .transform((value) => (value === "Yes" ? true : false)),
-  higher_education: z
+  higher_ed: z
     .string()
     .min(1, { message: requiredMessage })
     .transform((value) => (value === "Yes" ? true : false)),
+  study_time: z
+    .string()
+    .refine((value) => value in TRAVEL_TIME, { message: validMessage }),
   // other information
   internet_access: z
     .string()
@@ -118,25 +121,54 @@ const studentSchema = z.object({
     .number()
     .min(1, { message: "Value must be at least 1" })
     .max(5, { message: "value must be at most 5" }),
+  free_time: z
+    .number()
+    .min(1, { message: "Value must be at least 1" })
+    .max(5, { message: "value must be at most 5" }),
 
   // admission
-  course: z.coerce.number(),
-  year: z.number().min(1, {message: "At least year 1"}).max(6, {message: "At most year 6"})
+  course: z.coerce.number().min(1, {message: "Please select a course"}),
+  year: z
+    .number()
+    .min(1, { message: "At least year 1" })
+    .max(6, { message: "At most year 6" }),
+  email: z.string().email(),
 });
 
-export async function addStudent(prevState: unknown, formData: FormData){
-  const validationResult = studentSchema.safeParse(Object.fromEntries(formData.entries()))
+export async function addStudent(prevState: unknown, formData: FormData) {
+  const session = await auth();
 
-  if(!validationResult.success) return validationResult.error.formErrors.fieldErrors;
+  if (!session || !session.user || !session.user.email) {
+    return { errorMessage: "No user in session" };
+  }
 
-  const data = validationResult.data
+  const schoolId = (await db.user.findUnique({
+    where: { email: session.user.email },
+    select: { SchoolAdministrator: { select: { schoolId: true } } },
+  }))?.SchoolAdministrator[0].schoolId;
+
+  if (!schoolId) return {errorMessage: "School not found"}
+
+  const validationResult = studentSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
+
+  if (!validationResult.success)
+    return validationResult.error.formErrors.fieldErrors;
+
+  const data = validationResult.data;
 
   // upload file
-  const imagePath = await saveFilePublic("/students/",`${data.first_name}_${data.last_name}`, data.image);
-  // data.image = imagePath;
-  
+  const imagePath = await saveFilePublic(
+    "/students/",
+    `${data.first_name}_${data.last_name}`,
+    data.image
+  );
 
-  // db.student.create({data: data});
+  let { image, ...studentData } = data;
+  const cleaned = { ...studentData, imagePath, schoolId };
+
+  // db.student.create({ data: data });
 }
 
 async function getRows(file: File) {

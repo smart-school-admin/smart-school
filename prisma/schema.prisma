@@ -27,7 +27,9 @@ model User {
 
 model Student {
   id                    String               @id @default(uuid())
-  index_number          Int                  @unique
+  id_num                Int                  @default(autoincrement())
+  // index_number          Int                  @unique
+  email                 String //
   first_name            String //
   last_name             String //
   other_names           String //
@@ -58,7 +60,7 @@ model Student {
   higher_ed             Boolean //
   internet_access       Boolean //
   romantic_relationship Boolean //
-  free_time             Int //
+  free_time             Int                  @default(0)
   social                Int
   absences              Int                  @default(0)
   time_registered       DateTime             @default(now()) //
