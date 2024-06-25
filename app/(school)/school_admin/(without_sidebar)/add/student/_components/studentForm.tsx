@@ -1,5 +1,6 @@
 "use client";
 /** react imports */
+import { useState } from "react";
 import { useFormState } from "react-dom";
 
 /** component imports */
@@ -12,6 +13,8 @@ import { objectToOptions } from "@/lib/utils";
 import { ProfileImageUpload } from "@/components/general/forms/imageUpload";
 import FormError from "@/components/general/forms/formError";
 import { toast } from "sonner";
+
+import { Country, State, City } from "country-state-city";
 
 /** prisma imports */
 import {
@@ -39,6 +42,16 @@ export default function StudentForm({
 }) {
   const [errors, action] = useFormState(addStudent, {});
 
+  const [countryCode, setCountryCode] = useState<string>("GH");
+  const [stateCode, setStateCode] = useState<string>(
+    State.getStatesOfCountry(countryCode)[0].isoCode
+  );
+  const [cityCode, setCityCode] = useState<string>(
+    City.getCitiesOfState(countryCode, stateCode)[0].name
+  );
+
+  const countries = Country.getAllCountries();
+
   if (errors && "errorMessage" in errors) {
     toast.error(errors.errorMessage);
   }
@@ -49,8 +62,8 @@ export default function StudentForm({
         Student Image
         <ProfileImageUpload name="image" />
         {errors && "image" in errors && (
-              <FormError>{errors.image![0]}</FormError>
-            )}
+          <FormError>{errors.image![0]}</FormError>
+        )}
       </div>
       {/************ PROFILE IMAGE [end]****************/}
       {/************ PERSONAL INFORMATION [start]****************/}
@@ -105,6 +118,10 @@ export default function StudentForm({
             {errors && "address_type" in errors && (
               <FormError>{errors.address_type![0]}</FormError>
             )}
+          </div>
+          <div>
+            <Label>Country</Label>
+            {/* <CountrySelect/> */}
           </div>
         </div>
       </div>

@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 const fontMontserrat = Montserrat({
-  subsets: ["latin"],
+  subsets: ["cyrillic"],
   variable: "--font-montserrat",
 });
 
