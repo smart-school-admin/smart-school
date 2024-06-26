@@ -19,10 +19,24 @@
 //   PopoverTrigger,
 // } from "@/components/ui/popover";
 
-
-// export function Selector<T>({options, placeholder}: {options: T[], placeholder?: string}) {
+// export function Selector({
+//   options,
+//   placeholder,
+//   nameField,
+//   valueField,
+// }: {
+//   options:
+//     | { name: string; value: string; [key: string]: any }[]
+//     | { name: string; iosCode: string; [key: string]: any }[];
+//   placeholder?: string;
+//   nameField: string;
+//   valueField: string;
+// }) {
 //   const [open, setOpen] = React.useState(false);
-//   const [value, setValue] = React.useState("");
+//   const [value, setValue] = React.useState<{
+//     name: string;
+//     [key: string]: any;
+//   }>();
 
 //   return (
 //     <Popover open={open} onOpenChange={setOpen}>
@@ -33,9 +47,7 @@
 //           aria-expanded={open}
 //           className="w-[200px] justify-between"
 //         >
-//           {value
-//             ? options.find((option) => option.code === value)?.name
-//             : placeholder??"Select"}
+//           {value ? value.name : placeholder ?? "Select"}
 //           <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 //         </Button>
 //       </PopoverTrigger>
@@ -47,10 +59,12 @@
 //             <CommandGroup>
 //               {options.map((option) => (
 //                 <CommandItem
-//                   key={option.code}
-//                   value={option.code}
+//                   key={option.name}
+//                   //   value={option.name}
 //                   onSelect={(currentValue) => {
-//                     setValue(currentValue === value ? "" : currentValue);
+//                     setValue(currentValue === value ? "" : currentValue
+//                         currentValue.ios
+//                     );
 //                     setOpen(false);
 //                   }}
 //                 >

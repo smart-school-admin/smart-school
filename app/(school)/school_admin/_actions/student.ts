@@ -46,6 +46,9 @@ const studentSchema = z.object({
   address_type: z.string().refine((item) => item in ADDRESS_TYPE, {
     message: "Please select valid value",
   }),
+  state: z.string().min(1, { message: requiredMessage }),
+  city: z.string().min(1, { message: requiredMessage }),
+  //family information
   family_size: z
     .string()
     .refine((value) => value in FAMILY_SIZE, { message: validMessage }),
@@ -127,7 +130,7 @@ const studentSchema = z.object({
     .max(5, { message: "value must be at most 5" }),
 
   // admission
-  course: z.coerce.number().min(1, {message: "Please select a course"}),
+  course: z.coerce.number().min(1, { message: "Please select a course" }),
   year: z
     .number()
     .min(1, { message: "At least year 1" })
@@ -142,12 +145,14 @@ export async function addStudent(prevState: unknown, formData: FormData) {
     return { errorMessage: "No user in session" };
   }
 
-  const schoolId = (await db.user.findUnique({
-    where: { email: session.user.email },
-    select: { SchoolAdministrator: { select: { schoolId: true } } },
-  }))?.SchoolAdministrator[0].schoolId;
+  const schoolId = (
+    await db.user.findUnique({
+      where: { email: session.user.email },
+      select: { SchoolAdministrator: { select: { schoolId: true } } },
+    })
+  )?.SchoolAdministrator[0].schoolId;
 
-  if (!schoolId) return {errorMessage: "School not found"}
+  if (!schoolId) return { errorMessage: "School not found" };
 
   const validationResult = studentSchema.safeParse(
     Object.fromEntries(formData.entries())

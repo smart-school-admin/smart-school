@@ -1,6 +1,6 @@
 "use client";
 /** react imports */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useFormState } from "react-dom";
 
 /** component imports */
@@ -13,8 +13,9 @@ import { objectToOptions } from "@/lib/utils";
 import { ProfileImageUpload } from "@/components/general/forms/imageUpload";
 import FormError from "@/components/general/forms/formError";
 import { toast } from "sonner";
+import { CountrySelector } from "@/components/general/forms/CountryStateCitySelector";
 
-import { Country, State, City } from "country-state-city";
+import { Country, State, City, IState, ICity } from "country-state-city";
 
 /** prisma imports */
 import {
@@ -41,16 +42,36 @@ export default function StudentForm({
   courses: { id: number; code: string; name: string }[];
 }) {
   const [errors, action] = useFormState(addStudent, {});
+  const countries = Country.getAllCountries();
+  const [statesData, setstatesData] = useState<IState[]>();
+  const [citiesData, setCitiesData] = useState<ICity[]>();
 
   const [countryCode, setCountryCode] = useState<string>("GH");
   const [stateCode, setStateCode] = useState<string>(
-    State.getStatesOfCountry(countryCode)[0].isoCode
+    State.getStatesOfCountry("GH")[0].isoCode
   );
-  const [cityCode, setCityCode] = useState<string>(
-    City.getCitiesOfState(countryCode, stateCode)[0].name
+  const [city, setCity] = useState<string>(
+    City.getCitiesOfState("GH", State.getStatesOfCountry("GH")[0].isoCode)[0]
+      .name
   );
 
-  const countries = Country.getAllCountries();
+  useEffect(() => {
+    setstatesData(State.getStatesOfCountry(countryCode ?? undefined));
+  }, [countryCode]);
+
+  useEffect(() => {
+    setCitiesData(
+      City.getCitiesOfState(countryCode ?? undefined, stateCode ?? undefined)
+    );
+  }, [stateCode]);
+
+  useEffect(() => {
+    statesData && setStateCode(statesData[0].isoCode);
+  }, [statesData]);
+
+  useEffect(() => {
+    citiesData && setCity(citiesData[0].name);
+  }, [citiesData]);
 
   if (errors && "errorMessage" in errors) {
     toast.error(errors.errorMessage);
@@ -121,7 +142,39 @@ export default function StudentForm({
           </div>
           <div>
             <Label>Country</Label>
-            {/* <CountrySelect/> */}
+            <SSSelect
+              disabled
+              defaultValue="GH"
+              name="city"
+              options={countries.map((country) => ({
+                name: country.name,
+                value: country.isoCode,
+              }))}
+              onValueChange={setCountryCode}
+            />
+          </div>
+          <div>
+            <Label>State</Label>
+            <SSSelect
+              defaultValue={statesData? statesData[0].isoCode: ""}
+              name="state"
+              options={statesData?.map((state) => ({
+                name: state.name,
+                value: state.isoCode,
+              }))}
+              onValueChange={setStateCode}
+            />
+          </div>
+          <div>
+            <Label>City</Label>
+            <SSSelect
+              name="city"
+              options={citiesData?.map((city) => ({
+                name: city.name,
+                value: city.name,
+              }))}
+              onValueChange={setCity}
+            />
           </div>
         </div>
       </div>

@@ -66,8 +66,8 @@ model Student {
   time_registered       DateTime             @default(now()) //
   Attendance            Attendance[]
   Grade                 Grade[]
-  region                String //
-  district              String //
+  state                String //
+  city                  String //
   course                Course               @relation(fields: [courseId], references: [id])
   courseId              Int
   updatedAt             DateTime             @updatedAt
