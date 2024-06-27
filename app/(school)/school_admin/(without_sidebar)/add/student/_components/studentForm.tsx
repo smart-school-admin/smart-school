@@ -450,14 +450,14 @@ export default function StudentForm({
           <div>
             <Label>Course</Label>
             <SSSelect
-              name="course"
+              name="courseId"
               options={courses.map((course) => ({
                 name: `${course.code}-${course.name}`,
                 value: course.id.toString(),
               }))}
             />
-            {errors && "course" in errors && (
-              <FormError>{errors.course![0]}</FormError>
+            {errors && "courseId" in errors && (
+              <FormError>{errors.courseId![0]}</FormError>
             )}
           </div>
           <div>

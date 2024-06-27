@@ -19,12 +19,13 @@ import {
   PARENT_STATUS,
   SCHOOL_CHOICE_REASON,
   TRAVEL_TIME,
+  WEEKLY_STUDY_TIME,
 } from "@prisma/client";
 
 /** for parsing */
 import { parseStream, parseString } from "fast-csv";
 import { Student } from "@prisma/client";
-import { z } from "zod";
+import { TypeOf, z } from "zod";
 
 const requiredMessage = "This field is required";
 const validMessage = "Please select valid value";
@@ -39,51 +40,27 @@ const studentSchema = z.object({
   last_name: z.string().min(1, { message: requiredMessage }),
   other_names: z.string().min(1, { message: requiredMessage }),
   age: z.coerce.number({ message: "Please enter a number" }),
-  gender: z
-    .string()
-    .refine((item) => item in GENDER, { message: validMessage }),
-  dob: z.date(),
-  address_type: z.string().refine((item) => item in ADDRESS_TYPE, {
-    message: "Please select valid value",
-  }),
+  gender: z.nativeEnum(GENDER),
+  dob: z.coerce.date(),
+  address_type: z.nativeEnum(ADDRESS_TYPE),
   state: z.string().min(1, { message: requiredMessage }),
   city: z.string().min(1, { message: requiredMessage }),
   //family information
-  family_size: z
-    .string()
-    .refine((value) => value in FAMILY_SIZE, { message: validMessage }),
-  parent_status: z
-    .string()
-    .refine((value) => value in PARENT_STATUS, { message: validMessage }),
-  mother_job: z
-    .string()
-    .refine((value) => value in JOB, { message: validMessage }),
-  father_job: z
-    .string()
-    .refine((value) => value in JOB, { message: validMessage }),
-  mother_education: z
-    .string()
-    .refine((value) => value in EDUCATION, { message: validMessage }),
-  father_education: z
-    .string()
-    .refine((value) => value in EDUCATION, { message: validMessage }),
-  guardian: z
-    .string()
-    .refine((value) => value in GUARDIAN, { message: validMessage }),
-  family_relationship: z
+  family_size: z.nativeEnum(FAMILY_SIZE),
+  parent_status: z.nativeEnum(PARENT_STATUS),
+  mother_job: z.nativeEnum(JOB),
+  father_job: z.nativeEnum(JOB),
+  mother_education: z.nativeEnum(EDUCATION),
+  father_education: z.nativeEnum(EDUCATION),
+  guardian: z.nativeEnum(GUARDIAN),
+  family_relationship: z.coerce
     .number()
     .min(1, { message: "Value must be at least 1" })
     .max(5, { message: "value must be at most 5" }),
 
   // education information
-  school_choice_reason: z
-    .string()
-    .refine((value) => value in SCHOOL_CHOICE_REASON, {
-      message: validMessage,
-    }),
-  travel_time: z
-    .string()
-    .refine((value) => value in TRAVEL_TIME, { message: validMessage }),
+  school_choice_reason: z.nativeEnum(SCHOOL_CHOICE_REASON),
+  travel_time: z.nativeEnum(TRAVEL_TIME),
   nursery_school: z
     .string()
     .min(1, { message: requiredMessage })
@@ -108,9 +85,7 @@ const studentSchema = z.object({
     .string()
     .min(1, { message: requiredMessage })
     .transform((value) => (value === "Yes" ? true : false)),
-  study_time: z
-    .string()
-    .refine((value) => value in TRAVEL_TIME, { message: validMessage }),
+  study_time: z.nativeEnum(WEEKLY_STUDY_TIME),
   // other information
   internet_access: z
     .string()
@@ -120,18 +95,18 @@ const studentSchema = z.object({
     .string()
     .min(1, { message: requiredMessage })
     .transform((value) => (value === "Yes" ? true : false)),
-  social: z
+  social: z.coerce
     .number()
     .min(1, { message: "Value must be at least 1" })
     .max(5, { message: "value must be at most 5" }),
-  free_time: z
+  free_time: z.coerce
     .number()
     .min(1, { message: "Value must be at least 1" })
     .max(5, { message: "value must be at most 5" }),
 
   // admission
-  course: z.coerce.number().min(1, { message: "Please select a course" }),
-  year: z
+  courseId: z.coerce.number().min(1, { message: "Please select a course" }),
+  year: z.coerce
     .number()
     .min(1, { message: "At least year 1" })
     .max(6, { message: "At most year 6" }),
@@ -173,7 +148,7 @@ export async function addStudent(prevState: unknown, formData: FormData) {
   let { image, ...studentData } = data;
   const cleaned = { ...studentData, imagePath, schoolId };
 
-  // db.student.create({ data: data });
+  db.student.create({ data: cleaned });
 }
 
 async function getRows(file: File) {
