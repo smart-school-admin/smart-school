@@ -1,4 +1,6 @@
 "use server";
+/** next imports */
+import { redirect } from "next/navigation";
 
 import * as fs from "fs";
 import { auth } from "@/auth";
@@ -26,6 +28,9 @@ import {
 import { parseStream, parseString } from "fast-csv";
 import { Student } from "@prisma/client";
 import { TypeOf, z } from "zod";
+
+/** functions */
+import { getSchoolIdByEmail } from "./shared";
 
 const requiredMessage = "This field is required";
 const validMessage = "Please select valid value";
@@ -113,6 +118,7 @@ const studentSchema = z.object({
   email: z.string().email(),
 });
 
+/** function to add a single student */
 export async function addStudent(prevState: unknown, formData: FormData) {
   const session = await auth();
 
@@ -120,12 +126,7 @@ export async function addStudent(prevState: unknown, formData: FormData) {
     return { errorMessage: "No user in session" };
   }
 
-  const schoolId = (
-    await db.user.findUnique({
-      where: { email: session.user.email },
-      select: { SchoolAdministrator: { select: { schoolId: true } } },
-    })
-  )?.SchoolAdministrator[0].schoolId;
+  const schoolId = await getSchoolIdByEmail(session.user.email);
 
   if (!schoolId) return { errorMessage: "School not found" };
 
@@ -141,14 +142,30 @@ export async function addStudent(prevState: unknown, formData: FormData) {
   // upload file
   const imagePath = await saveFilePublic(
     "/students/",
-    `${data.first_name}_${data.last_name}`,
+    `${data.first_name}_${data.last_name}_${data.image.name}`,
     data.image
   );
 
   let { image, ...studentData } = data;
   const cleaned = { ...studentData, imagePath, schoolId };
 
-  db.student.create({ data: cleaned });
+  await db.student.create({ data: cleaned });
+}
+
+/** function to get all students of school */
+export async function getAllStudents() {
+  const session = await auth();
+
+  if (!session || !session.user || !session.user.email) {
+    redirect("/");
+  }
+
+  const schoolId = await getSchoolIdByEmail(session.user.email);
+
+  return await db.student.findMany({
+    where: { schoolId },
+    include: { course: { select: { name: true, code: true } } },
+  });
 }
 
 async function getRows(file: File) {

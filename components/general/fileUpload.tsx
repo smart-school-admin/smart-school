@@ -20,12 +20,11 @@ export default function FileUpload({
   name?: string;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const [fileName, setFileName] = useState<string>();
+  const [file, setFile] = useState<File>();
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (fileRef.current!.value) {
-      const nameList = fileRef.current!.value.split("\\");
-      setFileName(nameList[nameList.length - 1]);
-    }
+    if (event.target.files) {
+      setFile(event.target.files[0]);
+    } else setFile(undefined);
   };
   return (
     <div className="relative">
@@ -37,7 +36,7 @@ export default function FileUpload({
         )}
       >
         <CloudUploadIcon className="w-8 h-8" />
-        <span>{fileName ? fileName : "Upload"}</span>
+        <span>{file ? file.name : "Upload"}</span>
         <input
           name={name}
           onChange={handleChange}
@@ -48,13 +47,13 @@ export default function FileUpload({
           accept=".csv"
         />
       </label>
-      {fileName && (
+      {file && (
         <Button
           variant="destructive"
           className="absolute right-4 top-4 w-12  h-12 rounded-full"
           onClick={() => {
             fileRef.current!.value = "";
-            setFileName("");
+            setFile(undefined);
           }}
         >
           <XIcon />

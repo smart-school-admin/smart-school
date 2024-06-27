@@ -35,10 +35,8 @@ import {
 import { addStudent } from "@/app/(school)/school_admin/_actions/student";
 
 export default function StudentForm({
-  schools,
   courses,
 }: {
-  schools: { id: string; name: string }[];
   courses: { id: number; code: string; name: string }[];
 }) {
   const [errors, action] = useFormState(addStudent, {});
@@ -76,6 +74,11 @@ export default function StudentForm({
   if (errors && "errorMessage" in errors) {
     toast.error(errors.errorMessage);
   }
+  // if (!errors) {
+  //   toast.success("Student added successfully");
+  //   errors = {}
+  // }
+
   return (
     <form action={action} className="py-4 flex flex-col gap-8 w-full">
       {/************ PROFILE IMAGE [start]****************/}
@@ -121,7 +124,7 @@ export default function StudentForm({
           </div>
           <div>
             <Label>Gender</Label>
-            <SSSelect options={objectToOptions(GENDER)} />
+            <SSSelect options={objectToOptions(GENDER)} name="gender" />
             {errors && "gender" in errors && (
               <FormError>{errors.gender![0]}</FormError>
             )}
@@ -135,7 +138,10 @@ export default function StudentForm({
           </div>
           <div className="col-span-2">
             <Label>Address Type</Label>
-            <SSSelect options={objectToOptions(ADDRESS_TYPE)} />
+            <SSSelect
+              options={objectToOptions(ADDRESS_TYPE)}
+              name="address_type"
+            />
             {errors && "address_type" in errors && (
               <FormError>{errors.address_type![0]}</FormError>
             )}
@@ -156,7 +162,7 @@ export default function StudentForm({
           <div>
             <Label>State</Label>
             <SSSelect
-              defaultValue={statesData? statesData[0].isoCode: ""}
+              defaultValue={statesData ? statesData[0].isoCode : ""}
               name="state"
               options={statesData?.map((state) => ({
                 name: state.name,
