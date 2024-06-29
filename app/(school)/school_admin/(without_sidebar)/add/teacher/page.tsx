@@ -2,10 +2,11 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import db from "@/db/db";
 import MultiTeachersUpload from "./_components/multileTeachersUploadForm";
+import TeacherForm from "./_components/teacherForm";
 
 export default async function AddStudentPage() {
   const subjects = await db.subject.findMany({
-    select: { id: true, name: true },
+    select: { id: true, code: true, name: true },
   });
 
   return (
@@ -21,10 +22,10 @@ export default async function AddStudentPage() {
         </TabsList>
         <TabsContent value="single">
           {/* <TeacherForm subjects={subjects} /> */}
-          <div>Teacher form goes</div>
+          <TeacherForm subjects={subjects} />
         </TabsContent>
         <TabsContent value="multiple">
-          <MultiTeachersUpload/>
+          <MultiTeachersUpload />
         </TabsContent>
       </Tabs>
     </div>
