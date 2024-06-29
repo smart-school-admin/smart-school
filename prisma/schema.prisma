@@ -97,22 +97,24 @@ model School {
 }
 
 model Teacher {
-  id                    String   @id
-  user                  User     @relation(fields: [id], references: [id])
+  id                    String    @id @default(uuid())
+  user                  User      @relation(fields: [id], references: [id])
   first_name            String
   last_name             String
   other_names           String
   gender                GENDER
-  region                String
-  district              String
-  educational_level     String
+  age                   Int
+  dob                   DateTime
+  state                 String
+  city                  String
+  educational_level     EDUCATION
   num_seminars_attended Int
   length_of_service     Int
-  school                School   @relation(fields: [schoolId], references: [id])
+  school                School    @relation(fields: [schoolId], references: [id])
   schoolId              String
-  subject               Subject  @relation(fields: [subjectId], references: [id])
+  subject               Subject   @relation(fields: [subjectId], references: [id])
   subjectId             Int
-  updatedAt             DateTime @updatedAt
+  updatedAt             DateTime  @updatedAt
   imagePath             String
 }
 
