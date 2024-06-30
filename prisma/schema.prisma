@@ -97,7 +97,7 @@ model School {
 }
 
 model Teacher {
-  id                    String    @id @default(uuid())
+  id                    String    @id
   user                  User      @relation(fields: [id], references: [id])
   first_name            String
   last_name             String

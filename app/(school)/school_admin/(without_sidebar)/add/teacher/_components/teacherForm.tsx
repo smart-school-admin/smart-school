@@ -17,10 +17,7 @@ import { toast } from "sonner";
 import { Country, State, City, IState, ICity } from "country-state-city";
 
 /** prisma imports */
-import {
-  GENDER,
-  EDUCATION,
-} from "@prisma/client";
+import { GENDER, EDUCATION } from "@prisma/client";
 
 /** server actions */
 import { addTeacher } from "@/app/(school)/school_admin/_actions/teachers";
@@ -201,6 +198,27 @@ export default function TeacherForm({
         </div>
       </div>
       {/************ EDUCATION INFORMATION [end]****************/}
+      {/************ ACCOUNT INFORMATION [start]****************/}
+      <div className="w-full py-4 flex flex-col gap-4">
+        <h2 className="font-semibold">Account Information</h2>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label>Email</Label>
+            <Input type="text" min={0} name="email" />
+            {errors && "email" in errors && (
+              <FormError>{errors.email![0]}</FormError>
+            )}
+          </div>
+          <div>
+            <Label>Email</Label>
+            <Input type="text" min={0} name="password" />
+            {errors && "password" in errors && (
+              <FormError>{errors.password![0]}</FormError>
+            )}
+          </div>
+        </div>
+      </div>
+      {/************ ACCOUNT INFORMATION [end]****************/}
       <SubmitButton />
     </form>
   );

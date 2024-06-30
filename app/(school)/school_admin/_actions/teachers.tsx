@@ -1,11 +1,12 @@
 import { z } from "zod";
 
-import { EDUCATION, GENDER } from "@prisma/client";
+import { EDUCATION, GENDER, Teacher, USER_ROLE } from "@prisma/client";
 import { auth } from "@/auth";
 import { getSchoolIdByEmail } from "./shared";
-import { saveFilePublic } from "@/app/_utils/utils";
+import { hashPassword, saveFilePublic } from "@/app/_utils/utils";
 import { imageSchema } from "@/lib/schemas";
 import db from "@/db/db";
+import { SECURITY } from "@/lib/constants";
 
 const requiredMessage = "Required";
 const createTeacherSchema = z.object({
@@ -27,6 +28,12 @@ const createTeacherSchema = z.object({
     .number()
     .min(0, { message: "Please enter valid value" }),
   subjectId: z.coerce.number().min(1, { message: "Please select a subject" }),
+  email: z.string().email(),
+  password: z
+    .string()
+    .refine((password) => SECURITY.PASSWORD_REGEX.test(password), {
+      message: SECURITY.PASSWORD_ERROR_MSG,
+    }),
 });
 
 export async function addTeacher(prevState: unknown, formData: FormData) {
@@ -35,10 +42,6 @@ export async function addTeacher(prevState: unknown, formData: FormData) {
   if (!session || !session.user || !session.user.email) {
     return { errorMessage: "No user in session" };
   }
-
-  const schoolId = await getSchoolIdByEmail(session.user.email);
-
-  if (!schoolId) return { errorMessage: "School not found" };
 
   const validationResult = createTeacherSchema.safeParse(
     Object.fromEntries(formData.entries())
@@ -49,6 +52,22 @@ export async function addTeacher(prevState: unknown, formData: FormData) {
 
   const data = validationResult.data;
 
+  const exists = !!(await db.user.findUnique({ where: { email: data.email } }));
+  if (exists) return { errorMessage: "user already exists" };
+
+  // create the user
+  const user = await db.user.create({
+    data: {
+      email: data.email,
+      password: hashPassword(data.password),
+      role: USER_ROLE.teacher,
+    },
+  });
+
+  // get school id
+  const schoolId = await getSchoolIdByEmail(session.user.email);
+  if (!schoolId) return { errorMessage: "School not found" };
+
   // upload file
   const imagePath = await saveFilePublic(
     "/teachers/",
@@ -57,7 +76,27 @@ export async function addTeacher(prevState: unknown, formData: FormData) {
   );
 
   let { image, ...teacherData } = data;
-  const cleaned = { ...teacherData, imagePath, schoolId };
+  const cleaned = { ...teacherData, imagePath, schoolId, id: user.id };
 
   await db.teacher.create({ data: cleaned });
+}
+
+export async function getTeachers() : Promise<{errorMessage?: string, data?:({ subject: { name: string } } & Teacher)[], success?:boolean}>{
+  const session = await auth();
+
+  if (!session || !session.user || !session.user.email) {
+    return { errorMessage: "No user in session", success: false };
+  }
+
+  const schoolId = await getSchoolIdByEmail(session.user.email);
+  if (!schoolId) return { errorMessage: "School not found" };
+
+  const data =  await db.teacher.findMany({
+    where: { schoolId: schoolId },
+    include: {
+      subject: { select: { name: true } },
+    },
+  });
+
+  return {data: data, success: true}
 }
