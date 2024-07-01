@@ -1,3 +1,4 @@
+"use client"
 import {
   Select,
   SelectContent,
@@ -5,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import React from "react";
+import React, { useEffect } from "react";
 
 export default function SSSelect(
   props: {
@@ -17,6 +18,7 @@ export default function SSSelect(
     disabled?: boolean
   }
 ) {
+
   return (
     <Select name={props.name} onValueChange={props.onValueChange} defaultValue={props.defaultValue} disabled={props.disabled}>
       <SelectTrigger>
@@ -24,7 +26,7 @@ export default function SSSelect(
       </SelectTrigger>
       <SelectContent>
         {props.options?.map((option, index) => (
-          <SelectItem key={index} value={option.value} defaultChecked={option.value==props.defaultValue}>
+          <SelectItem key={index} value={option.value} defaultChecked={option.value===props.defaultValue}>
             {option.name}
           </SelectItem>
         ))}

@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 
 const DateInput: React.FC<React.HTMLProps<HTMLInputElement>> = (props) => {
   const [date, setDate] = React.useState<Date | undefined>(
-    props.defaultValue ? new Date(props.defaultValue as string) : undefined
+    props.defaultValue ? new Date(props.defaultValue as string) : new Date()
   );
 
   return (

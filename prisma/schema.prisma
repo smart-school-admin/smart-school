@@ -105,6 +105,7 @@ model Teacher {
   gender                GENDER
   age                   Int
   dob                   DateTime
+  country               String
   state                 String
   city                  String
   educational_level     EDUCATION

@@ -19,13 +19,13 @@ export default async function TeachersPage() {
           </Button>
         </Link>
       </h1>
-      <div className="flex flex-col gap-6">
+      {/* <div className="flex flex-col gap-6">
         {Array(5)
           .fill(0)
           .map((item, index) => (
             <TeacherCard key={index} />
           ))}
-      </div>
+      </div> */}
       {response.data && response.data.length > 0 && (
         <div className="flex flex-col gap-6">
           {response.data.map(

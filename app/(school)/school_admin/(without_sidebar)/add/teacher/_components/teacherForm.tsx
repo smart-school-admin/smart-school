@@ -61,6 +61,7 @@ export default function TeacherForm({
 
   if (errors && "errorMessage" in errors) {
     toast.error(errors.errorMessage);
+    delete errors.errorMessage;
   }
 
   return (
@@ -124,13 +125,16 @@ export default function TeacherForm({
             <Label>Country</Label>
             <SSSelect
               defaultValue="GH"
-              name="city"
+              name="country"
               options={countries.map((country) => ({
                 name: country.name,
                 value: country.isoCode,
               }))}
               onValueChange={setCountryCode}
             />
+            {errors && "country" in errors && (
+              <FormError>{errors.country![0]}</FormError>
+            )}
           </div>
           <div>
             <Label>State</Label>
@@ -164,7 +168,7 @@ export default function TeacherForm({
           <div>
             <Label>Highest Educational Level</Label>
             <SSSelect
-              name="education_level"
+              name="educational_level"
               options={objectToOptions(EDUCATION)}
             />
             {errors && "educational_level" in errors && (
@@ -210,8 +214,8 @@ export default function TeacherForm({
             )}
           </div>
           <div>
-            <Label>Email</Label>
-            <Input type="text" min={0} name="password" />
+            <Label>Password</Label>
+            <Input type="password" min={0} name="password" />
             {errors && "password" in errors && (
               <FormError>{errors.password![0]}</FormError>
             )}

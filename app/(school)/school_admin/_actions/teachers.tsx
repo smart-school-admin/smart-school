@@ -1,3 +1,5 @@
+"use server";
+
 import { z } from "zod";
 
 import { EDUCATION, GENDER, Teacher, USER_ROLE } from "@prisma/client";
@@ -7,6 +9,7 @@ import { hashPassword, saveFilePublic } from "@/app/_utils/utils";
 import { imageSchema } from "@/lib/schemas";
 import db from "@/db/db";
 import { SECURITY } from "@/lib/constants";
+import { redirect } from "next/navigation";
 
 const requiredMessage = "Required";
 const createTeacherSchema = z.object({
@@ -23,8 +26,10 @@ const createTeacherSchema = z.object({
   state: z.string().min(1, { message: requiredMessage }),
   city: z.string().min(1, { message: requiredMessage }),
   educational_level: z.nativeEnum(EDUCATION),
-  length_of_service: z.number().min(0, { message: "Please enter valid value" }),
-  num_seminars_attended: z
+  length_of_service: z.coerce
+    .number()
+    .min(0, { message: "Please enter valid value" }),
+  num_seminars_attended: z.coerce
     .number()
     .min(0, { message: "Please enter valid value" }),
   subjectId: z.coerce.number().min(1, { message: "Please select a subject" }),
@@ -55,33 +60,43 @@ export async function addTeacher(prevState: unknown, formData: FormData) {
   const exists = !!(await db.user.findUnique({ where: { email: data.email } }));
   if (exists) return { errorMessage: "user already exists" };
 
-  // create the user
-  const user = await db.user.create({
-    data: {
-      email: data.email,
-      password: hashPassword(data.password),
-      role: USER_ROLE.teacher,
-    },
-  });
+  try {
+    // create the user
+    const user = await db.user.create({
+      data: {
+        email: data.email,
+        password: hashPassword(data.password),
+        role: USER_ROLE.teacher,
+      },
+    });
 
-  // get school id
-  const schoolId = await getSchoolIdByEmail(session.user.email);
-  if (!schoolId) return { errorMessage: "School not found" };
+    // get school id
+    const schoolId = await getSchoolIdByEmail(session.user.email);
+    if (!schoolId) return { errorMessage: "School not found" };
 
-  // upload file
-  const imagePath = await saveFilePublic(
-    "/teachers/",
-    `${data.first_name}_${data.last_name}_${data.image.name}`,
-    data.image
-  );
+    // upload file
+    const imagePath = await saveFilePublic(
+      "/teachers/",
+      `${data.first_name}_${data.last_name}_${data.image.name}`,
+      data.image
+    );
 
-  let { image, ...teacherData } = data;
-  const cleaned = { ...teacherData, imagePath, schoolId, id: user.id };
+    let { image, email, password, ...teacherData } = data;
+    const cleaned = { ...teacherData, imagePath, schoolId, id: user.id };
 
-  await db.teacher.create({ data: cleaned });
+    await db.teacher.create({ data: cleaned });
+  } catch (err:any) {
+    return {errorMessage: err.message??"Something went wrong"}
+  }
+
+  redirect("/school_admin/teachers");
 }
 
-export async function getTeachers() : Promise<{errorMessage?: string, data?:({ subject: { name: string } } & Teacher)[], success?:boolean}>{
+export async function getTeachers(): Promise<{
+  errorMessage?: string;
+  data?: ({ subject: { name: string } } & Teacher)[];
+  success?: boolean;
+}> {
   const session = await auth();
 
   if (!session || !session.user || !session.user.email) {
@@ -91,12 +106,12 @@ export async function getTeachers() : Promise<{errorMessage?: string, data?:({ s
   const schoolId = await getSchoolIdByEmail(session.user.email);
   if (!schoolId) return { errorMessage: "School not found" };
 
-  const data =  await db.teacher.findMany({
+  const data = await db.teacher.findMany({
     where: { schoolId: schoolId },
     include: {
       subject: { select: { name: true } },
     },
   });
 
-  return {data: data, success: true}
+  return { data: data, success: true };
 }

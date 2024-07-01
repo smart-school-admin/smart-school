@@ -1,5 +1,6 @@
 /** next imports */
 import Link from "next/link";
+import Image from "next/image";
 
 /** component imports */
 import { Card } from "@/components/ui/card";
@@ -35,7 +36,7 @@ export default function TeacherCard({
       <div className="h-full flex justify-between items-center flex-grow px-8 py-4">
         <div className="flex gap-2">
           <Avatar>
-            <AvatarImage src={image} />
+            <AvatarImage src={image}/>
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div>
