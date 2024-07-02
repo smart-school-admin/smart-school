@@ -218,3 +218,48 @@ export async function addStudentsFromFile(
 
   return {};
 }
+
+/** function to get students by Id and by school */
+export async function getTeacherStudents(): Promise<{
+  errorMessage?: string;
+  data?: any;
+  success?: boolean;
+}> {
+  const session = await auth();
+
+  if (!session || !session.user || !session.user.email) {
+    redirect("/");
+  }
+
+  const schoolId = getSchoolIdByEmail(session.user.email);
+  const teacher = await db.user.findUnique({
+    where: { email: session.user.email },
+    select: { id: true },
+  });
+
+  if (!teacher) return { errorMessage: "Teacher not found", success: false };
+  const teacherId = teacher.id;
+
+  const subject = await db.teacher.findUnique({
+    where: { id: teacherId },
+    select: { subjectId: true },
+  });
+  if (!subject)
+    return { errorMessage: "subject does not exist", success: false };
+
+  const students = await db.student.findMany({
+    include: {
+      course: {
+        include: {
+          subjects: {
+            where: { id: subject.subjectId },
+            select: { id: true },
+          },
+        },
+      },
+    },
+  });
+
+  console.log(students);
+  return { success: true, data: students };
+}
