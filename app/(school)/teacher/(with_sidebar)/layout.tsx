@@ -5,9 +5,7 @@ import LogoutSidebarItem from "../../school_admin/_components/logoutSidebarItem"
 
 /** icon imports */
 import { LayoutDashboardIcon } from "lucide-react";
-import { GraduationCapIcon } from "lucide-react";
 import { BookUserIcon } from "lucide-react";
-import { LogOutIcon } from "lucide-react";
 
 /** server action imports */
 import { signOut } from "@/auth";
