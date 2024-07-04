@@ -220,6 +220,10 @@ export async function addStudentsFromFile(
 }
 
 /** function to get students by Id and by school */
+// type TeacherStudent = {
+//   first_name: string;
+//   last_name: string;
+// }
 export async function getTeacherStudents(): Promise<{
   errorMessage?: string;
   data?: any;
@@ -231,34 +235,62 @@ export async function getTeacherStudents(): Promise<{
     redirect("/");
   }
 
-  const schoolId = getSchoolIdByEmail(session.user.email);
-  const teacher = await db.user.findUnique({
-    where: { email: session.user.email },
-    select: { id: true },
-  });
+  const teacherId = session.user.id;
 
-  if (!teacher) return { errorMessage: "Teacher not found", success: false };
-  const teacherId = teacher.id;
+  const schoolId = (
+    await db.teacher.findUnique({
+      where: { id: teacherId },
+      select: { schoolId: true },
+    })
+  )?.schoolId;
+
+  if (!schoolId)
+    return { errorMessage: "You are not affiliated with a school" };
 
   const subject = await db.teacher.findUnique({
     where: { id: teacherId },
     select: { subjectId: true },
   });
+
   if (!subject)
     return { errorMessage: "subject does not exist", success: false };
 
+
   const students = await db.student.findMany({
-    include: {
+    where: { schoolId: schoolId },
+    select: {
+      first_name: true,
+      last_name: true,
+      other_names: true,
+      imagePath: true,
       course: {
-        include: {
+        select: {
+          code: true,
+          name: true,
           subjects: {
             where: { id: subject.subjectId },
-            select: { id: true },
+            select: {id: true}
           },
         },
       },
     },
   });
 
-  return { success: true, data: students };
+  // console.log(await db.teacher.findUnique({where:{id: session.user.id}}))
+  // console.log(
+  //   await db.course.findMany({
+  //     select: {
+  //       subjects: {
+  //         where: {id: 1},
+  //         select: { id: true },
+  //       },
+  //       id: true
+  //     },
+  //   })
+  // );
+
+  return {
+    success: true,
+    data: students.filter((student) => student.course.subjects.length > 0),
+  };
 }

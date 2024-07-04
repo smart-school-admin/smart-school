@@ -25,13 +25,34 @@ export const authConfig = {
     },
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const isOnDashboard = nextUrl.pathname.startsWith("/school_admin");
-      if (isOnDashboard) {
-        if (isLoggedIn) return true;
-        return false; // Redirect unauthenticated users to login page
-      } else if (isLoggedIn) {
-        return Response.redirect(new URL("/school_admin/dashboard", nextUrl));
+      const isSchoolAdminPath = nextUrl.pathname.startsWith("/school_admin");
+      const isTeacherPath = nextUrl.pathname.startsWith("/teacher");
+      const isAdminPath = nextUrl.pathname.startsWith("/admin");
+
+      if (isAdminPath) return true;
+      if (isLoggedIn) {
+        if (auth?.user.role === "schoolAdmin") {
+          if (isSchoolAdminPath) return true;
+          else
+            return Response.redirect(
+              new URL("/school_admin/dashboard", nextUrl)
+            );
+        }
+        if (auth?.user.role === "teacher") {
+          if (isTeacherPath) return true;
+          else return Response.redirect(new URL("/teacher/dashboard", nextUrl));
+        }
+      } else {
+        if(isAdminPath) return true
+        return false;
       }
+
+      // if (isOnDashboard) {
+      //   if (isLoggedIn) return true;
+      //   return false; // Redirect unauthenticated users to login page
+      // } else if (isLoggedIn) {
+      //   return Response.redirect(new URL("/school_admin/dashboard", nextUrl));
+      // }
       return true;
     },
   },

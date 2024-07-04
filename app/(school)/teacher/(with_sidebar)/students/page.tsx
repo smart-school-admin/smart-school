@@ -1,5 +1,6 @@
 /** next imports */
 import Link from "next/link";
+import { toast } from "sonner";
 
 /** component imports */
 import StudentCard from "@/app/(school)/_components/cards/studentCard";
@@ -13,6 +14,9 @@ import { PlusIcon } from "lucide-react";
 
 export default async function StudentsPage() {
   const response = await getTeacherStudents();
+  if(!response.success){
+    return <div>{response.errorMessage}</div>
+  }
   return (
     <div className="w-full min-h-full">
       <h1 className="text-2xl font-semibold mb-8  mt-4 flex justify-between">
