@@ -260,6 +260,5 @@ export async function getTeacherStudents(): Promise<{
     },
   });
 
-  console.log(students);
   return { success: true, data: students };
 }
