@@ -226,7 +226,20 @@ export async function addStudentsFromFile(
 // }
 export async function getTeacherStudents(): Promise<{
   errorMessage?: string;
-  data?: any;
+  data?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    other_names: string;
+    course: {
+      code: string;
+      name: string;
+      subjects: {
+        id: number;
+      }[];
+    };
+    imagePath: string | null;
+  }[];
   success?: boolean;
 }> {
   const session = await auth();
@@ -255,10 +268,10 @@ export async function getTeacherStudents(): Promise<{
   if (!subject)
     return { errorMessage: "subject does not exist", success: false };
 
-
   const students = await db.student.findMany({
     where: { schoolId: schoolId },
     select: {
+      id: true,
       first_name: true,
       last_name: true,
       other_names: true,
@@ -269,28 +282,53 @@ export async function getTeacherStudents(): Promise<{
           name: true,
           subjects: {
             where: { id: subject.subjectId },
-            select: {id: true}
+            select: { id: true },
           },
         },
       },
     },
   });
 
-  // console.log(await db.teacher.findUnique({where:{id: session.user.id}}))
-  // console.log(
-  //   await db.course.findMany({
-  //     select: {
-  //       subjects: {
-  //         where: {id: 1},
-  //         select: { id: true },
-  //       },
-  //       id: true
-  //     },
-  //   })
-  // );
-
   return {
     success: true,
     data: students.filter((student) => student.course.subjects.length > 0),
   };
+}
+
+export async function uploadStudentScores(data: {
+  scores: { [key: string]: number };
+  passMark: number;
+  semester: number;
+}) {
+  const session = await auth();
+
+  if (!session || !session.user || !session.user.email) {
+    return;
+  }
+
+  const teacherId = session.user.id;
+
+  const subject = await db.teacher.findUnique({
+    where: { id: teacherId },
+    select: { subjectId: true },
+  });
+
+  if (!subject)
+    return { errorMessage: "subject does not exist", success: false };
+
+  const subjectId = subject.subjectId;
+
+  const entries = [];
+  for (let key in data.scores) {
+    entries.push({
+      studentId: key,
+      score: data.scores[key],
+      passed: data.scores[key] > data.passMark,
+      subjectId: subjectId,
+      semester: data.semester,
+    });
+  }
+
+  const response = await db.grade.createMany({ data: entries });
+  return {success: true, data:entries.length}
 }

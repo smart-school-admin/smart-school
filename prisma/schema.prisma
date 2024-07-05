@@ -51,7 +51,6 @@ model Student {
   travel_time           TRAVEL_TIME //
   school_choice_reason  SCHOOL_CHOICE_REASON //
   study_time            WEEKLY_STUDY_TIME
-  class_failures        Int                  @default(0)
   school_support        Boolean //
   family_support        Boolean //
   extra_paid_classes    Boolean //
@@ -61,8 +60,7 @@ model Student {
   internet_access       Boolean //
   romantic_relationship Boolean //
   free_time             Int                  @default(0)
-  social                Int
-  absences              Int                  @default(0)
+  social                Int                @default(0)
   time_registered       DateTime             @default(now()) //
   Attendance            Attendance[]
   Grade                 Grade[]
@@ -78,10 +76,11 @@ model Grade {
   id          Int      @id @default(autoincrement())
   subject     Subject  @relation(fields: [subjectId], references: [id])
   subjectId   Int
-  semester    SEMESTER
+  semester    Int?
   student     Student  @relation(fields: [studentId], references: [id])
   studentId   String
   score       Float
+  passed      Boolean
   dateEntered DateTime @default(now())
 }
 
@@ -232,7 +231,7 @@ enum WEEKLY_STUDY_TIME {
   greater_than_10_hours
 }
 
-enum SEMESTER {
-  first
-  second
-}
+// enum SEMESTER {
+//   first
+//   second
+// }
