@@ -330,5 +330,43 @@ export async function uploadStudentScores(data: {
   }
 
   const response = await db.grade.createMany({ data: entries });
-  return {success: true, data:entries.length}
+  return { success: true, data: entries.length };
+}
+
+export async function predictGrandes(
+  studentId: string,
+  grades: {
+    subjectId: number;
+    score: number;
+    passed: boolean;
+    math_intensive: boolean;
+  }[]
+) {
+  const samples = [];
+  // getting student data with number of failures
+  const student = await db.student.findUnique({
+    where: { id: studentId },
+    include: {
+      _count: {
+        select: {
+          grades: { where: { passed: false } },
+          attendance: { where: { present: false } },
+        },
+      },
+    },
+  });
+
+  if (!student) return [];
+
+  const { _count, ...studentData } = student;
+  grades.forEach((grade) => {
+    samples.push({
+      ...studentData,
+      absences: _count.attendance,
+      class_failures: _count.grades,
+      math_intensive: grade.math_intensive,
+    });
+  });
+
+  // send data to ML API for prediction
 }

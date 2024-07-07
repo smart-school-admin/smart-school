@@ -60,10 +60,10 @@ model Student {
   internet_access       Boolean //
   romantic_relationship Boolean //
   free_time             Int                  @default(0)
-  social                Int                @default(0)
+  social                Int                  @default(0)
   time_registered       DateTime             @default(now()) //
-  Attendance            Attendance[]
-  Grade                 Grade[]
+  attendance            Attendance[]
+  grades                Grade[]
   state                 String //
   city                  String //
   course                Course               @relation(fields: [courseId], references: [id])
@@ -144,7 +144,7 @@ model Subject {
   code           String    @unique
   name           String
   math_intensive Boolean
-  Grade          Grade[]
+  grades         Grade[]
   Teacher        Teacher[]
   updatedAt      DateTime  @updatedAt
   Course         Course[]

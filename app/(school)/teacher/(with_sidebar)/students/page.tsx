@@ -14,8 +14,8 @@ import { PlusIcon } from "lucide-react";
 
 export default async function StudentsPage() {
   const response = await getTeacherStudents();
-  if(!response.success){
-    return <div>{response.errorMessage}</div>
+  if (!response.success) {
+    return <div>{response.errorMessage}</div>;
   }
   return (
     <div className="w-full min-h-full">
@@ -27,21 +27,23 @@ export default async function StudentsPage() {
           </Button>
         </Link>
       </h1>
-      {response.success && response.data.length < 0 && (
+      {response.success && response.data && response.data.length < 0 && (
         <div className="text-center">No students found</div>
       )}
-      {response.success && response.data.length > 0 && (
+      {response.success && response.data && response.data.length > 0 && (
         <div className="flex flex-col gap-6">
-          {response.data.map((student: any, index: number) => (
-            <StudentCard
-              key={index}
-              firstName={student.first_name}
-              lastName={student.last_name}
-              otherNames={student.other_names}
-              course={`${student.course.code}-${student.course.name}`}
-              image={student.imagePath ?? undefined}
-            />
-          ))}
+          {response.data &&
+            response.data.map((student: any, index: number) => (
+              <StudentCard
+                key={index}
+                studentId={student.id}
+                firstName={student.first_name}
+                lastName={student.last_name}
+                otherNames={student.other_names}
+                course={`${student.course.code}-${student.course.name}`}
+                image={student.imagePath ?? undefined}
+              />
+            ))}
         </div>
       )}
     </div>

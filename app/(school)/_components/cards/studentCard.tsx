@@ -11,10 +11,10 @@ import { ChevronRight } from "lucide-react";
 /** function imports */
 import { cn } from "@/lib/utils";
 
-import path from "path";
+
 
 type StudentCardProps = {
-  id?: string;
+  studentId: string;
   firstName: string;
   lastName: string;
   otherNames?: string;
@@ -25,7 +25,7 @@ type StudentCardProps = {
 };
 
 export default function StudentCard({
-  id,
+  studentId,
   firstName = "Victor",
   lastName = "Roque",
   contact = "+23324576892",
@@ -66,7 +66,8 @@ export default function StudentCard({
         </div>
       </div>
       <Link
-        href="#"
+        href={`/teacher/students/profile/${studentId}`}
+        target="_blank"
         className="h-full w-12 flex justify-center items-center bg-ssPrimary-100 self-stretch"
       >
         <ChevronRight className="w-6 h-6 stroke-white" />

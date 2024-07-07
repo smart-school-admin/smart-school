@@ -32,6 +32,7 @@ export default async function StudentsPage() {
           {students.map((student, index) => (
             <StudentCard
               key={index}
+              studentId={student.id}
               firstName={student.first_name}
               lastName={student.last_name}
               otherNames={student.other_names}
