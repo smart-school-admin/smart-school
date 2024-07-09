@@ -31,6 +31,9 @@ import { TypeOf, z } from "zod";
 
 /** functions */
 import { getSchoolIdByEmail } from "./shared";
+import { ML_API_ENDPOINTS } from "@/lib/endpoints";
+import path from "path";
+import axios, { AxiosError } from "axios";
 
 const requiredMessage = "This field is required";
 const validMessage = "Please select valid value";
@@ -333,7 +336,7 @@ export async function uploadStudentScores(data: {
   return { success: true, data: entries.length };
 }
 
-export async function predictGrandes(
+export async function predictGrades(
   studentId: string,
   grades: {
     subjectId: number;
@@ -342,7 +345,9 @@ export async function predictGrandes(
     math_intensive: boolean;
   }[]
 ) {
-  const samples = [];
+  if (!grades || grades.length < 1) return;
+
+  const samples: any = [];
   // getting student data with number of failures
   const student = await db.student.findUnique({
     where: { id: studentId },
@@ -356,7 +361,7 @@ export async function predictGrandes(
     },
   });
 
-  if (!student) return [];
+  if (!student) return;
 
   const { _count, ...studentData } = student;
   grades.forEach((grade) => {
@@ -365,8 +370,35 @@ export async function predictGrandes(
       absences: _count.attendance,
       class_failures: _count.grades,
       math_intensive: grade.math_intensive,
+      previous_grade: grade.score,
     });
   });
 
-  // send data to ML API for prediction
+  try {
+    const response = await axios.post(
+      `${process.env.ML_API_ROOT}/${ML_API_ENDPOINTS.studentGradePredict}`,
+      samples,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const predictions: { [key: string]: number } = {};
+    response.data.predictions.forEach((pred: number, index: number) => {
+      predictions[grades[index].subjectId] = pred;
+    });
+    return {success: {predictions: predictions, explanations: response.data.explanations}};
+  } catch (error: any) {
+    if (error.response) {
+      return {
+        error: `${error.status}:${error.message ?? "unfavorable response"}`,
+      };
+    } else if (error.request) {
+      return { error: error.message ? error.message : "No response received" };
+    } else {
+      return { error: error.message ?? "Something went wrong" };
+    }
+  }
 }
