@@ -1,10 +1,12 @@
 /** next imports */
 import Link from "next/link";
-import { toast } from "sonner";
+import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
+import SSDialog from "@/components/general/ssDialog";
 
 /** component imports */
 import StudentCard from "@/app/(school)/_components/cards/studentCard";
 import { Button } from "@/components/ui/button";
+import AttendanceMarker from "../../_components/attendanceMarker";
 
 /** functions */
 import { getTeacherStudents } from "@/app/(school)/school_admin/_actions/student";
@@ -12,6 +14,26 @@ import { getTeacherStudents } from "@/app/(school)/school_admin/_actions/student
 /** icon imports */
 import { PlusIcon } from "lucide-react";
 
+const students = [
+  {
+    id: "something",
+    first_name: "First",
+    last_name: "Last",
+    other_names: "Middle",
+  },
+  {
+    id: "something",
+    first_name: "First",
+    last_name: "Last",
+    other_names: "Middle",
+  },
+  {
+    id: "something",
+    first_name: "First",
+    last_name: "Last",
+    other_names: "Middle",
+  }
+]
 export default async function StudentsPage() {
   const response = await getTeacherStudents();
   if (!response.success) {
@@ -26,6 +48,14 @@ export default async function StudentsPage() {
             <PlusIcon /> New Student
           </Button>
         </Link>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button>Take Attendance</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <AttendanceMarker students={students}/>
+          </DialogContent>
+        </Dialog>
       </h1>
       {response.success && response.data && response.data.length < 0 && (
         <div className="text-center">No students found</div>

@@ -74,8 +74,6 @@ export default function StudentProfile({
 
   if (error && error.message) toast.error(error.message);
 
-
-
   return (
     <div className="h-screen p-4">
       <Card className="h-full overflow-hidden">
@@ -116,9 +114,7 @@ export default function StudentProfile({
               </CardContent>
             </Card>
             {response && response.success && response.success.explanations && (
-              <ExplanationsPlot
-                explanations={response.success.explanations}
-              />
+              <ExplanationsPlot explanations={response.success.explanations} />
             )}
           </div>
         </CardContent>
@@ -133,13 +129,13 @@ function ExplanationsPlot({
   explanations: [string, number][];
 }) {
   const data = explanations.map((item) => ({ name: item[0], value: item[1] }));
-  console.log(data)
+  console.log(data);
   return (
     <ResponsiveContainer width="100%" height={700}>
-      <BarChart data={data}>
-        <XAxis dataKey="name"/>
-        <YAxis dataKey="value"/>
-        <Bar dataKey="value" />
+      <BarChart data={data} layout="vertical" barSize={25}>
+        <XAxis dataKey="value" type="number"/>
+        <YAxis dataKey="name" type="category" />
+        <Bar dataKey="value" layout="vertical" />
       </BarChart>
     </ResponsiveContainer>
   );
