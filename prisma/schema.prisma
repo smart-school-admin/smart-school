@@ -154,6 +154,7 @@ model Subject {
 
 model Attendance {
   id        Int      @id @default(autoincrement())
+  meeting   Int // ordinal of meeting (eg 1st meeting, 2nd etc)
   date      DateTime @default(now()) @db.Date
   time      DateTime @default(now()) @db.Time()
   present   Boolean
@@ -162,7 +163,7 @@ model Attendance {
   teacher   Teacher  @relation(fields: [teacherId], references: [id])
   teacherId String
 
-  @@unique(name: "attendance_item", [studentId, date])
+  @@unique(name: "attendance_item", [teacherId, meeting, studentId, date])
 }
 
 // ENUMS

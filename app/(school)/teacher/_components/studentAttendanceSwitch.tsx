@@ -1,5 +1,5 @@
 "use client";
-import { useTransition } from "react";
+import { useTransition, useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { markStudentAttendance } from "../../school_admin/_actions/student";
 import { toast } from "sonner";
@@ -10,8 +10,10 @@ import { getTodaysAttendenceStudent } from "../../school_admin/_actions/student"
 
 export default function StudentAttendanceSwitch({
   studentId,
+  meeting,
 }: {
   studentId: string;
+  meeting: number;
 }) {
   const {
     data: todaysAttendance,
@@ -19,19 +21,29 @@ export default function StudentAttendanceSwitch({
     isLoading,
   } = useQuery({
     queryKey: [studentId],
-    queryFn: async () => await getTodaysAttendenceStudent(studentId),
+    queryFn: async () => await getTodaysAttendenceStudent(studentId, meeting),
+    refetchOnWindowFocus: false,
   });
   const [pending, startTransition] = useTransition();
+  const [checked, setChecked] = useState<boolean>(false);
+
+
+  // console.log(todaysAttendance)
+  useEffect(() => {
+    setChecked(!!todaysAttendance && todaysAttendance?.present);
+  }, [todaysAttendance]);
+
   return (
     <Switch
-      defaultChecked={todaysAttendance?.present}
+      checked={checked}
       disabled={pending || isLoading}
-      onCheckedChange={(check) =>
+      onCheckedChange={() => {
         startTransition(async () => {
-          await markStudentAttendance(studentId, check);
+          await markStudentAttendance(meeting, studentId, !checked);
           toast.success("Attendance");
-        })
-      }
+          setChecked((prev) => !prev);
+        });
+      }}
     />
   );
 }

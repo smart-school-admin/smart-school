@@ -410,6 +410,7 @@ export async function predictGrades(
 
 // function to mark student attendance
 export async function markStudentAttendance(
+  meeting: number,
   studentId: string,
   present: boolean
 ) {
@@ -424,6 +425,8 @@ export async function markStudentAttendance(
   const attendance = await db.attendance.findUnique({
     where: {
       attendance_item: {
+        teacherId: teacherId,
+        meeting: meeting,
         studentId: studentId,
         date: new Date(),
       },
@@ -436,6 +439,8 @@ export async function markStudentAttendance(
     await db.attendance.update({
       where: {
         attendance_item: {
+          teacherId: teacherId,
+          meeting: meeting,
           studentId: studentId,
           date: new Date(),
         },
@@ -448,6 +453,7 @@ export async function markStudentAttendance(
     await db.attendance.create({
       data: {
         teacherId: teacherId,
+        meeting: meeting,
         studentId: studentId,
         present: present,
       },
@@ -472,10 +478,22 @@ export async function getTodaysAttendance() {
   });
 }
 
-export async function getTodaysAttendenceStudent(studentId: string) {
+export async function getTodaysAttendenceStudent(
+  studentId: string,
+  meeting: number
+) {
+  const session = await auth();
+
+  if (!session || !session.user || !session.user.email) {
+    redirect("/");
+  }
+
+  const teacherId = session.user.id;
   return await db.attendance.findUnique({
     where: {
       attendance_item: {
+        teacherId: teacherId,
+        meeting: meeting,
         studentId: studentId,
         date: new Date(),
       },

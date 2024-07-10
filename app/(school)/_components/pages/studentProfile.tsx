@@ -70,6 +70,7 @@ export default function StudentProfile({
   } = useQuery({
     queryKey: ["grades_preds"],
     queryFn: async () => await predictGrades(studentData.id, gradesExtended),
+    refetchOnWindowFocus: false
   });
 
   if (error && error.message) toast.error(error.message);

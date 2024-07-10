@@ -14,26 +14,7 @@ import { getTeacherStudents } from "@/app/(school)/school_admin/_actions/student
 /** icon imports */
 import { PlusIcon } from "lucide-react";
 
-// const students = [
-//   {
-//     id: "something",
-//     first_name: "First",
-//     last_name: "Last",
-//     other_names: "Middle",
-//   },
-//   {
-//     id: "something",
-//     first_name: "First",
-//     last_name: "Last",
-//     other_names: "Middle",
-//   },
-//   {
-//     id: "something",
-//     first_name: "First",
-//     last_name: "Last",
-//     other_names: "Middle",
-//   }
-// ]
+
 export default async function StudentsPage() {
   const response = await getTeacherStudents();
   if (!response.success) {
