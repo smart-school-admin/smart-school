@@ -14,26 +14,26 @@ import { getTeacherStudents } from "@/app/(school)/school_admin/_actions/student
 /** icon imports */
 import { PlusIcon } from "lucide-react";
 
-const students = [
-  {
-    id: "something",
-    first_name: "First",
-    last_name: "Last",
-    other_names: "Middle",
-  },
-  {
-    id: "something",
-    first_name: "First",
-    last_name: "Last",
-    other_names: "Middle",
-  },
-  {
-    id: "something",
-    first_name: "First",
-    last_name: "Last",
-    other_names: "Middle",
-  }
-]
+// const students = [
+//   {
+//     id: "something",
+//     first_name: "First",
+//     last_name: "Last",
+//     other_names: "Middle",
+//   },
+//   {
+//     id: "something",
+//     first_name: "First",
+//     last_name: "Last",
+//     other_names: "Middle",
+//   },
+//   {
+//     id: "something",
+//     first_name: "First",
+//     last_name: "Last",
+//     other_names: "Middle",
+//   }
+// ]
 export default async function StudentsPage() {
   const response = await getTeacherStudents();
   if (!response.success) {
@@ -48,14 +48,16 @@ export default async function StudentsPage() {
             <PlusIcon /> New Student
           </Button>
         </Link>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>Take Attendance</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <AttendanceMarker students={students}/>
-          </DialogContent>
-        </Dialog>
+        {response && response.data && (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>Take Attendance</Button>
+            </DialogTrigger>
+              <SSDialog title="Mark Attendance">
+                <AttendanceMarker students={response.data} />
+              </SSDialog>
+          </Dialog>
+        )}
       </h1>
       {response.success && response.data && response.data.length < 0 && (
         <div className="text-center">No students found</div>

@@ -25,7 +25,7 @@ import {
             {props.title}
           </DialogTitle>
         </DialogHeader>
-        <div className="overflow-y-auto px-2">{props.children}</div>
+        <div className="overflow-y-auto px-2 py-8">{props.children}</div>
       </DialogContent>
     );
   }

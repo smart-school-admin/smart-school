@@ -389,7 +389,12 @@ export async function predictGrades(
     response.data.predictions.forEach((pred: number, index: number) => {
       predictions[grades[index].subjectId] = pred;
     });
-    return {success: {predictions: predictions, explanations: response.data.explanations}};
+    return {
+      success: {
+        predictions: predictions,
+        explanations: response.data.explanations,
+      },
+    };
   } catch (error: any) {
     if (error.response) {
       return {
@@ -401,4 +406,79 @@ export async function predictGrades(
       return { error: error.message ?? "Something went wrong" };
     }
   }
+}
+
+// function to mark student attendance
+export async function markStudentAttendance(
+  studentId: string,
+  present: boolean
+) {
+  const session = await auth();
+
+  if (!session || !session.user || !session.user.email) {
+    redirect("/");
+  }
+
+  const teacherId = session.user.id;
+
+  const attendance = await db.attendance.findUnique({
+    where: {
+      attendance_item: {
+        studentId: studentId,
+        date: new Date(),
+      },
+    },
+  });
+
+  const found = !!attendance;
+
+  if (found) {
+    await db.attendance.update({
+      where: {
+        attendance_item: {
+          studentId: studentId,
+          date: new Date(),
+        },
+      },
+      data: {
+        present: present,
+      },
+    });
+  } else {
+    await db.attendance.create({
+      data: {
+        teacherId: teacherId,
+        studentId: studentId,
+        present: present,
+      },
+    });
+  }
+}
+
+export async function getTodaysAttendance() {
+  const session = await auth();
+
+  if (!session || !session.user || !session.user.email) {
+    redirect("/");
+  }
+
+  const teacherId = session.user.id;
+
+  return await db.attendance.findMany({
+    where: {
+      teacherId: teacherId,
+      date: new Date(),
+    },
+  });
+}
+
+export async function getTodaysAttendenceStudent(studentId: string) {
+  return await db.attendance.findUnique({
+    where: {
+      attendance_item: {
+        studentId: studentId,
+        date: new Date(),
+      },
+    },
+  });
 }

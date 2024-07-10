@@ -96,8 +96,8 @@ model School {
 }
 
 model Teacher {
-  id                    String    @id
-  user                  User      @relation(fields: [id], references: [id])
+  id                    String       @id
+  user                  User         @relation(fields: [id], references: [id])
   first_name            String
   last_name             String
   other_names           String
@@ -110,12 +110,13 @@ model Teacher {
   educational_level     EDUCATION
   num_seminars_attended Int
   length_of_service     Int
-  school                School    @relation(fields: [schoolId], references: [id])
+  school                School       @relation(fields: [schoolId], references: [id])
   schoolId              String
-  subject               Subject   @relation(fields: [subjectId], references: [id])
+  subject               Subject      @relation(fields: [subjectId], references: [id])
   subjectId             Int
-  updatedAt             DateTime  @updatedAt
+  updatedAt             DateTime     @updatedAt
   imagePath             String
+  Attendance            Attendance[]
 }
 
 model SchoolAdministrator {
@@ -153,11 +154,15 @@ model Subject {
 
 model Attendance {
   id        Int      @id @default(autoincrement())
-  date      DateTime @default(now())
+  date      DateTime @default(now()) @db.Date
+  time      DateTime @default(now()) @db.Time()
   present   Boolean
-  semester  Int
   student   Student  @relation(fields: [studentId], references: [id])
   studentId String
+  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+  teacherId String
+
+  @@unique(name: "attendance_item", [studentId, date])
 }
 
 // ENUMS
