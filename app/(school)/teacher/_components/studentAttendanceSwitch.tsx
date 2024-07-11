@@ -20,13 +20,12 @@ export default function StudentAttendanceSwitch({
     error,
     isLoading,
   } = useQuery({
-    queryKey: [studentId],
+    queryKey: [studentId, meeting],
     queryFn: async () => await getTodaysAttendenceStudent(studentId, meeting),
     refetchOnWindowFocus: false,
   });
   const [pending, startTransition] = useTransition();
   const [checked, setChecked] = useState<boolean>(false);
-
 
 
   useEffect(() => {

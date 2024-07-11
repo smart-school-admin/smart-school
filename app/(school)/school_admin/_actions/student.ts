@@ -13,6 +13,7 @@ import { saveFilePublic } from "@/app/_utils/utils";
 import db from "@/db/db";
 import {
   ADDRESS_TYPE,
+  Attendance,
   EDUCATION,
   FAMILY_SIZE,
   GENDER,
@@ -30,10 +31,13 @@ import { Student } from "@prisma/client";
 import { TypeOf, z } from "zod";
 
 /** functions */
-import { getSchoolIdByEmail } from "./shared";
+import { getSchoolIdByEmail, getSessionId } from "./shared";
 import { ML_API_ENDPOINTS } from "@/lib/endpoints";
 import path from "path";
 import axios, { AxiosError } from "axios";
+
+/** models */
+import { ServerActionReturnModel } from "@/lib/models";
 
 const requiredMessage = "This field is required";
 const validMessage = "Please select valid value";
@@ -489,7 +493,7 @@ export async function getTodaysAttendenceStudent(
   }
 
   const teacherId = session.user.id;
-  const data =  await db.attendance.findUnique({
+  const data = await db.attendance.findUnique({
     where: {
       attendance_item: {
         teacherId: teacherId,
@@ -520,8 +524,66 @@ export async function getNumberOfMeetings() {
     distinct: ["meeting"],
   });
 
-  const meetings = [];
-  for(let i = 1; i<=uniqueMeetings.length; ++i) meetings.push(i)
+  const meetings = uniqueMeetings.map(meeting => meeting.meeting);
 
-  return meetings;
+  return meetings.sort();
+}
+
+export async function createMeeting(meeting: number): Promise<{
+  success?: boolean;
+  errorMessage?: string;
+  data?: any;
+}> {
+  const session = await auth();
+
+  if (!session || !session.user || !session.user.email) {
+    redirect("/");
+  }
+
+  const teacherId = session.user.id;
+
+  // getting students
+  const studentIds: string[] = [];
+  const studentsFetchResult = await getTeacherStudents();
+
+  if (studentsFetchResult.errorMessage)
+    return { errorMessage: studentsFetchResult.errorMessage, success: false };
+
+  const students = studentsFetchResult.data ?? [];
+
+  // creating attendance for each student
+  const attendance: {
+    teacherId: string;
+    studentId: string;
+    meeting: number;
+    date: Date;
+    present: boolean;
+  }[] = [];
+  students.forEach((student) =>
+    attendance.push({
+      teacherId: teacherId,
+      studentId: student.id,
+      meeting: meeting,
+      date: new Date(),
+      present: false,
+    })
+  );
+
+  await db.attendance.createMany({ data: attendance });
+
+  return { success: true };
+}
+
+export async function deleteMeeting(meeting: number): Promise<ServerActionReturnModel> {
+  const teacherId = await getSessionId();
+
+  await db.attendance.deleteMany({
+    where: {
+      teacherId: teacherId,
+      meeting: meeting,
+      date: new Date(),
+    },
+  });
+
+  return {success: true}
 }
