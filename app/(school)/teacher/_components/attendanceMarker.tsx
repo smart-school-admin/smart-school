@@ -1,12 +1,16 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import StudentAttendanceSwitch from "./studentAttendanceSwitch";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useQuery } from "@tanstack/react-query";
 
 // server actions
-import { getTodaysAttendance } from "../../school_admin/_actions/student";
+import {
+  getTodaysAttendance,
+  getNumberOfMeetings,
+} from "../../school_admin/_actions/student";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function AttendanceMarker({
   students,
@@ -19,21 +23,45 @@ export default function AttendanceMarker({
   }[];
 }) {
   const [meeting, setMeeting] = useState<number>(1);
+  const [meetings, setMeetings] = useState<number[]>([]);
+
+  const { data, error, isLoading } = useQuery({
+    queryKey: ["meetings_array"],
+    queryFn: async () => await getNumberOfMeetings(),
+    refetchOnWindowFocus: false,
+  });
+
+  // if(!isLoading && !error && data) setMeetings(data);
+  useEffect(() => {
+    if (!isLoading && !error && data) setMeetings(data);
+    console.log(data)
+  }, [data]);
+
+  const addMeeting = () => {
+    setMeetings((prev) => {
+      const newState = [...prev];
+      if (newState.length < 1) newState.push(1);
+      else newState.push(newState[newState.length - 1] + 1);
+      return newState;
+    });
+  };
 
   return (
     <div>
       <div className="flex justify-center items-center gap-4 mb-8">
-        <Label>Meeting</Label>
-        <Input
-          type="number"
-          value={meeting}
-          onChange={(event) => {
-            setMeeting(parseInt(event.target.value));
-          }}
-          min={1}
-          max={20}
-          className="w-24 h-8 outline-none"
-        />
+        <Button onClick={addMeeting}>New Meeting</Button>
+      </div>
+      <div className="w-full flex gap-4 flex-wrap">
+        {meetings &&
+          meetings.map((currentMeeting, index) => (
+            <Button
+              key={index}
+              variant={currentMeeting === meeting ? "destructive" : "default"}
+              onClick={() => setMeeting(currentMeeting)}
+            >
+              {currentMeeting}
+            </Button>
+          ))}
       </div>
       <div className="flex flex-col gap-4">
         {students &&

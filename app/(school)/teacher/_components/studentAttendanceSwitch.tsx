@@ -28,7 +28,7 @@ export default function StudentAttendanceSwitch({
   const [checked, setChecked] = useState<boolean>(false);
 
 
-  // console.log(todaysAttendance)
+
   useEffect(() => {
     setChecked(!!todaysAttendance && todaysAttendance?.present);
   }, [todaysAttendance]);

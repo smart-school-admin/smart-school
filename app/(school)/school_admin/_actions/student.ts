@@ -489,7 +489,7 @@ export async function getTodaysAttendenceStudent(
   }
 
   const teacherId = session.user.id;
-  return await db.attendance.findUnique({
+  const data =  await db.attendance.findUnique({
     where: {
       attendance_item: {
         teacherId: teacherId,
@@ -499,4 +499,29 @@ export async function getTodaysAttendenceStudent(
       },
     },
   });
+
+  return data;
+}
+
+export async function getNumberOfMeetings() {
+  const session = await auth();
+
+  if (!session || !session.user || !session.user.email) {
+    redirect("/");
+  }
+
+  const teacherId = session.user.id;
+
+  const uniqueMeetings = await db.attendance.findMany({
+    where: {
+      teacherId: teacherId,
+      date: new Date(),
+    },
+    distinct: ["meeting"],
+  });
+
+  const meetings = [];
+  for(let i = 1; i<=uniqueMeetings.length; ++i) meetings.push(i)
+
+  return meetings;
 }
