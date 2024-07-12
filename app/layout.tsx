@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Montserrat } from "next/font/google";
+import { Inter, Montserrat, Kumbh_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import Providers from "@/lib/providers/query-provider";
@@ -11,6 +11,10 @@ const inter = Inter({ subsets: ["latin"] });
 const fontMontserrat = Montserrat({
   subsets: ["cyrillic"],
   variable: "--font-montserrat",
+});
+const fontKumbhSans = Kumbh_Sans({
+  subsets: ["latin"],
+  variable: "--font-kumbh-sans",
 });
 
 export const metadata: Metadata = {
@@ -27,7 +31,8 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={cn(
-          "min-h-screen bg-background antialiased font-montserrat",
+          "min-h-screen bg-background antialiased font-kumbhSans",
+          fontKumbhSans.variable,
           fontMontserrat.variable
         )}
       >

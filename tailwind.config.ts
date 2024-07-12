@@ -1,14 +1,14 @@
-import {fontFamily} from "tailwindcss/defaultTheme"
-import type { Config } from "tailwindcss"
+import { fontFamily } from "tailwindcss/defaultTheme";
+import type { Config } from "tailwindcss";
 
 const config = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
-	],
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
   prefix: "",
   theme: {
     container: {
@@ -20,12 +20,22 @@ const config = {
     },
     extend: {
       fontFamily: {
-        montserrat: ["var(--font-montserrat)", ...fontFamily.sans]
+        montserrat: ["var(--font-montserrat)", ...fontFamily.sans],
+        kumbhSans: ["var(--font-kumbh-sans)", ...fontFamily.sans],
       },
       colors: {
         ssPrimary: {
+          100: "#D90000",
+          foreground: "#ffffff",
+        },
+        ssSecondary: {
           100: "#0c7ef0",
-          foreground: "#ffffff"
+          foreground: "#ffffff",
+        },
+        ssGray: {
+          100: "#C4C4C4",
+          200: "#8A8A8A",
+          300: "#424242",
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -83,6 +93,6 @@ const config = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-} satisfies Config
+} satisfies Config;
 
-export default config
+export default config;

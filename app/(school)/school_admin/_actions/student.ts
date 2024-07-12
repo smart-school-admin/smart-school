@@ -238,6 +238,9 @@ export async function getTeacherStudents(): Promise<{
     first_name: string;
     last_name: string;
     other_names: string;
+    age: number;
+    email: string;
+    gender: string;
     course: {
       code: string;
       name: string;
@@ -245,7 +248,7 @@ export async function getTeacherStudents(): Promise<{
         id: number;
       }[];
     };
-    imagePath: string | null;
+    imagePath?: string | null;
   }[];
   success?: boolean;
 }> {
@@ -283,6 +286,9 @@ export async function getTeacherStudents(): Promise<{
       last_name: true,
       other_names: true,
       imagePath: true,
+      age: true,
+      email: true,
+      gender: true,
       course: {
         select: {
           code: true,
@@ -524,7 +530,7 @@ export async function getNumberOfMeetings() {
     distinct: ["meeting"],
   });
 
-  const meetings = uniqueMeetings.map(meeting => meeting.meeting);
+  const meetings = uniqueMeetings.map((meeting) => meeting.meeting);
 
   return meetings.sort();
 }
@@ -574,7 +580,9 @@ export async function createMeeting(meeting: number): Promise<{
   return { success: true };
 }
 
-export async function deleteMeeting(meeting: number): Promise<ServerActionReturnModel> {
+export async function deleteMeeting(
+  meeting: number
+): Promise<ServerActionReturnModel> {
   const teacherId = await getSessionId();
 
   await db.attendance.deleteMany({
@@ -585,5 +593,5 @@ export async function deleteMeeting(meeting: number): Promise<ServerActionReturn
     },
   });
 
-  return {success: true}
+  return { success: true };
 }
