@@ -239,7 +239,9 @@ export async function getTeacherStudents(): Promise<{
     last_name: string;
     other_names: string;
     age: number;
-    email: string;
+    email: string | null;
+    phone_number: string | null;
+    index_number: number;
     gender: string;
     course: {
       code: string;
@@ -289,6 +291,8 @@ export async function getTeacherStudents(): Promise<{
       age: true,
       email: true,
       gender: true,
+      phone_number: true,
+      index_number: true,
       course: {
         select: {
           code: true,
@@ -594,4 +598,21 @@ export async function deleteMeeting(
   });
 
   return { success: true };
+}
+
+// function to get details of a single student
+export async function getStudentDetails(studentId: string) {
+  const student = await db.student.findUnique({
+    where: { id: studentId },
+    include: {
+      course: {
+        select: {
+          name: true,
+          code: true
+        },
+      },
+    },
+  });
+
+  return student;
 }

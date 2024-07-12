@@ -9,20 +9,7 @@ import { Button } from "@/components/ui/button";
 import AttendanceMarker from "../../_components/attendanceMarker";
 import StudentsList from "@/app/(school)/_components/students/studentsList";
 import { CheckCircle } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+
 
 /** functions */
 import { getTeacherStudents } from "@/app/(school)/school_admin/_actions/student";
@@ -52,6 +39,7 @@ export default async function StudentsPage() {
           </Dialog>
         )}
       </h1>
+      <hr className="mb-4"/>
       {response.success && response.data && response.data.length < 0 && (
         <div className="text-center">No students found</div>
       )}
@@ -59,18 +47,6 @@ export default async function StudentsPage() {
         <div className="flex flex-col gap-6">
           {response.data && (<StudentsList students={response.data}/>)
            }
-          {/* {response.data &&
-            response.data.map((student: any, index: number) => (
-              <StudentCard
-                key={index}
-                studentId={student.id}
-                firstName={student.first_name}
-                lastName={student.last_name}
-                otherNames={student.other_names}
-                course={`${student.course.code}-${student.course.name}`}
-                image={student.imagePath ?? undefined}
-              />
-            ))} */}
         </div>
       )}
     </div>

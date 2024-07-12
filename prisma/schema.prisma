@@ -28,8 +28,9 @@ model User {
 model Student {
   id                    String               @id @default(uuid())
   id_num                Int                  @default(autoincrement())
-  // index_number          Int                  @unique
-  email                 String //
+  index_number          Int                  @default(autoincrement())
+  phone_number          String?
+  email                 String? //
   first_name            String //
   last_name             String //
   other_names           String //
@@ -93,6 +94,7 @@ model School {
   Teacher             Teacher[]
   badgeImagePath      String
   SchoolAdministrator SchoolAdministrator?
+  Class               Class[]
 }
 
 model Teacher {
@@ -164,6 +166,15 @@ model Attendance {
   teacherId String
 
   @@unique(name: "attendance_item", [teacherId, meeting, studentId, date])
+}
+
+model Class {
+  school   School @relation(fields: [schoolId], references: [id])
+  schoolId String
+  name     String
+  classId  String
+
+  @@id(name: "school_class", [schoolId, classId])
 }
 
 // ENUMS

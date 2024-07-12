@@ -24,7 +24,6 @@ export default async function StudentProfilePage({
     WHERE row_num = 1;
   `;
 
-
   const studentData = await db.student.findUnique({
     where: { id: params.studentId },
     select: {
@@ -32,12 +31,18 @@ export default async function StudentProfilePage({
       first_name: true,
       last_name: true,
       other_names: true,
+      imagePath: true,
+      phone_number: true,
+      index_number: true,
+      email: true,
       year: true,
       course: {
         select: {
           name: true,
           code: true,
-          subjects: { select: { id: true, code: true, name: true, math_intensive: true } },
+          subjects: {
+            select: { id: true, code: true, name: true, math_intensive: true },
+          },
         },
       },
     },
@@ -55,7 +60,6 @@ export default async function StudentProfilePage({
   });
 
   // console.log(await predictGrades(params.studentId, results))
-
 
   return <StudentProfile studentData={studentData!} grades={subjectScores} />;
 }
