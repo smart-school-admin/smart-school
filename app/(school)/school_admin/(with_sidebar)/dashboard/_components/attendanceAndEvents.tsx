@@ -58,16 +58,16 @@ export default function AttendanceAndEvents() {
   return (
     <Card className="p-4">
       <div className="flex gap-2">
-        <StatCard className="bg-ssPrimary-100 flex text-white flex-col gap-2">
-          <span className="font-semibold">Student Attendance</span>
-          <span className="font-semibold">75%</span>
+        <div className="bg-ssPrimary-100 flex text-white flex-col gap-2 p-4 rounded-md">
+          <span className="text-sm">Student Attendance</span>
+          <span className="text-sm">75%</span>
           <ViewDetailsLink href="#" className="mt-auto" />
-        </StatCard>
-        <StatCard className="bg-ssPrimary-100 flex text-white flex-col gap-2">
-          <span className="font-semibold">Teacher Attendance</span>
-          <span className="font-semibold">100%</span>
+        </div>
+        <div className="bg-ssPrimary-100 flex text-white flex-col gap-2 p-4 rounded-md">
+          <span className="text-sm">Teacher Attendance</span>
+          <span className="text-sm">100%</span>
           <ViewDetailsLink href="#" className="mt-auto" />
-        </StatCard>
+        </div>
       </div>
       <div className="mt-4">
         <h1 className="text-xl text-center mb-2">Upcoming Events</h1>

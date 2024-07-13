@@ -106,6 +106,7 @@ model Teacher {
   gender                GENDER
   age                   Int
   dob                   DateTime
+  phone_number          String?
   country               String
   state                 String
   city                  String

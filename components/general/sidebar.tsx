@@ -39,10 +39,10 @@ export function SidebarItem(props: ComponentProps<typeof Link>) {
     <Link
       href={props.href}
       className={cn(
-        "w-100 p-2 rounded-sm hover:text-ssPrimary-100 text-sm flex gap-2 items-center transition-colors",
+        "w-100 p-2 rounded-sm text-sm flex gap-2 items-center transition-colors hover:text-muted-foreground",
         props.className,
         usePathname() == props.href &&
-          "bg-ssPrimary-100 font-semibold text-ssPrimary-foreground hover:text-white"
+          "bg-slate-100/50"
       )}
     >
       {props.children}

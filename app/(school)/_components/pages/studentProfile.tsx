@@ -1,6 +1,9 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { predictGrades } from "../../school_admin/_actions/student";
+import {
+  getAbscencesSummary,
+  predictGrades,
+} from "../../school_admin/_actions/student";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
@@ -8,6 +11,7 @@ import { MailIcon, PhoneCallIcon } from "lucide-react";
 
 import { Drawer, DrawerTrigger } from "@/components/ui/drawer";
 import StatsDrawerContent from "./_components/statsDrawerContent";
+import { cn } from "@/lib/utils";
 
 type StudentProfileProps = {
   studentData: {
@@ -47,6 +51,7 @@ export default function StudentProfile({
     math_intensive: boolean;
   }[] = [];
 
+  // getting average score over all subjects
   let avgScore = 0;
   studentData.course.subjects.forEach((subject) => {
     if (grades[subject.id]) {
@@ -59,12 +64,11 @@ export default function StudentProfile({
     }
   });
 
-  avgScore/=gradesExtended.length;
+  avgScore /= gradesExtended.length;
 
   const {
     data: predictionsResponse,
     error,
-    refetch,
     isError,
     isLoading,
   } = useQuery({
@@ -75,12 +79,23 @@ export default function StudentProfile({
 
   let predictedAvg = 0;
 
-  if(predictionsResponse?.success){
-    for(let key of Object.keys(predictionsResponse?.success?.predictions)){
-      predictedAvg+=predictionsResponse?.success?.predictions[key]
+  if (predictionsResponse?.success) {
+    for (let key of Object.keys(predictionsResponse?.success?.predictions)) {
+      predictedAvg += predictionsResponse?.success?.predictions[key];
     }
   }
-  predictedAvg/=gradesExtended.length;
+  predictedAvg /= gradesExtended.length;
+
+  const {
+    data: abscencesSummary,
+    isLoading: abscencesLoading,
+    error: abscencesError,
+    isError: abscencesIsError,
+  } = useQuery({
+    queryKey: ["abscences_data"],
+    queryFn: async () => await getAbscencesSummary(studentData.id),
+    refetchOnWindowFocus: false,
+  });
 
   if (error && error.message) toast.error(error.message);
 
@@ -122,7 +137,14 @@ export default function StudentProfile({
               <div>
                 <span className="text-ssGray-200 text-sm">Average</span>
 
-                <div className="text-5xl text-green-700 ">{avgScore.toFixed(2)}</div>
+                <div
+                  className={cn(
+                    "text-5xl",
+                    avgScore > 50 ? "text-green-700" : "text-red-700"
+                  )}
+                >
+                  {avgScore.toFixed(2)}
+                </div>
               </div>
             </div>
             <div>
@@ -133,7 +155,7 @@ export default function StudentProfile({
                 <Drawer>
                   <DrawerTrigger asChild>
                     <div className="text-5xl text-purple-700 cursor-pointer">
-                      {isLoading && "?"}
+                      {isLoading && "..."}
                       {!isLoading && predictedAvg.toFixed(2)}
                     </div>
                   </DrawerTrigger>
@@ -147,7 +169,22 @@ export default function StudentProfile({
             </div>
             <div>
               <span className="text-ssGray-200 text-sm">Abscences</span>
-              <div className="text-5xl text-blue-700">21/38</div>
+              <div className="text-5xl text-black">
+                {abscencesSummary && (
+                  <span
+                    className={cn(
+                      abscencesSummary.summary.totalAbscences >
+                        abscencesSummary.summary.totalNumberOfMeetings / 2
+                        ? "text-red-700"
+                        : "text-green-700"
+                    )}
+                  >
+                    {abscencesSummary.summary.totalAbscences}/
+                    {abscencesSummary.summary.totalNumberOfMeetings}
+                  </span>
+                )}
+                {abscencesLoading && <span>...</span>}
+              </div>
             </div>
           </div>
         </div>
@@ -155,12 +192,23 @@ export default function StudentProfile({
           <h3 className="text-2xl text-ssGray-300">LIVE UPDATES</h3>
           <div className="flex gap-12">
             <div>
-              <span className="text-ssGray-200 text-sm">Average</span>
-              <div className="text-5xl text-ssPrimary-100">78.12</div>
-            </div>
-            <div>
-              <span className="text-ssGray-200 text-sm">Average</span>
-              <div className="text-5xl text-ssPrimary-100">78.12</div>
+              <span className="text-ssGray-200 text-sm">Todays Abscences</span>
+              <div className="text-5xl text-black">
+                {abscencesSummary && (
+                  <span
+                    className={cn(
+                      abscencesSummary.today.totalTodaysAbscences >
+                        abscencesSummary.today.totalTodaysMeetings / 2
+                        ? "text-red-700"
+                        : "text-green-700"
+                    )}
+                  >
+                    {abscencesSummary.today.totalTodaysAbscences}/
+                    {abscencesSummary.today.totalTodaysMeetings}
+                  </span>
+                )}
+                {abscencesLoading && <span>...</span>}
+              </div>
             </div>
           </div>
         </div>

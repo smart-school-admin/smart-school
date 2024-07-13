@@ -7,24 +7,26 @@ import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 
-import { getStudentDetails } from "../../school_admin/_actions/student";
+import { getTeacherDetails } from "../../school_admin/_actions/teachers";
 
-export default function StudentBrief({
-  studentId,
+export default function TeacherBrief({
+  teacherId,
   ...props
-}: { studentId?: string } & React.HTMLProps<HTMLElement>) {
-  if (!studentId)
+}: { teacherId?: string } & React.HTMLProps<HTMLElement>) {
+  if (!teacherId)
     return (
       <div className="flex justify-center items-center">
-        No Student Selected
+        No Teacher Selected
       </div>
     );
   const { data, isLoading, error, isError } = useQuery({
-    queryKey: ["student data", studentId],
+    queryKey: ["student data", teacherId],
     queryFn: async () => {
-      if (studentId) return await getStudentDetails(studentId);
+      if (teacherId) return await getTeacherDetails(teacherId);
     },
   });
+
+  console.log(data);
 
   if (isError) {
     return (
@@ -50,7 +52,6 @@ export default function StudentBrief({
       )}
     >
       <div>
-        <div className="text-center">{data?.index_number}</div>
         <Avatar className="w-40 h-40 my-6">
           <AvatarImage src={data?.imagePath ?? ""} />
           <AvatarFallback>CN</AvatarFallback>
@@ -60,20 +61,20 @@ export default function StudentBrief({
             {data!.first_name} {data!.last_name}
           </h2>
           <div className="text-ssGray-200 text-sm text-center">
-            {data!.course.code}-{data!.course.name}
+            {data!.subject.code}-{data!.subject.name}
           </div>
         </div>
       </div>
 
       {/** Icons */}
       <div className="flex justify-center gap-4">
-        <Link href={`tel:${data!.phone_number}`}>
+        {data!.phone_number && <Link href={`tel:${data!.phone_number}`}>
           <PhoneCallIcon className="w-6 h-6 stroke-ssGray-300" />
-        </Link>
-        <Link href={`mailto:${data!.email}`}>
+        </Link>}
+        <Link href={`mailto:${data!.user.email}`}>
           <MailIcon className="w-6 h-6 stroke-ssGray-300" />
         </Link>
-        <Link href={`students/profile/${studentId}`} target="_blank">
+        <Link href={`teachers/profile/${teacherId}`} target="_blank">
           <ChevronRight className="w-6 h-6 stroke-ssGray-300" />
         </Link>
       </div>

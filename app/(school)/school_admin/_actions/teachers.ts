@@ -85,8 +85,8 @@ export async function addTeacher(prevState: unknown, formData: FormData) {
     const cleaned = { ...teacherData, imagePath, schoolId, id: user.id };
 
     await db.teacher.create({ data: cleaned });
-  } catch (err:any) {
-    return {errorMessage: err.message??"Something went wrong"}
+  } catch (err: any) {
+    return { errorMessage: err.message ?? "Something went wrong" };
   }
 
   redirect("/school_admin/teachers");
@@ -94,7 +94,7 @@ export async function addTeacher(prevState: unknown, formData: FormData) {
 
 export async function getTeachers(): Promise<{
   errorMessage?: string;
-  data?: ({ subject: { name: string } } & Teacher)[];
+  data?: ({ subject: { name: string, code: string } } & Teacher & {user: {email: string}})[];
   success?: boolean;
 }> {
   const session = await auth();
@@ -103,15 +103,36 @@ export async function getTeachers(): Promise<{
     return { errorMessage: "No user in session", success: false };
   }
 
-  const schoolId = await getSchoolIdByEmail(session.user.email);
-  if (!schoolId) return { errorMessage: "School not found" };
+  const schoolId = (
+    await db.schoolAdministrator.findUnique({
+      where: {
+        id: session.user.id,
+      },
+      select: {
+        schoolId: true,
+      },
+    })
+  )?.schoolId;
+
+  if (!schoolId) redirect("/");
 
   const data = await db.teacher.findMany({
     where: { schoolId: schoolId },
     include: {
-      subject: { select: { name: true } },
+      subject: { select: { name: true, code: true } },
+      user: { select: { email: true } },
     },
   });
 
   return { data: data, success: true };
+}
+
+export async function getTeacherDetails(teacherId: string) {
+  return await db.teacher.findUnique({
+    where: { id: teacherId },
+    include: {
+      subject: { select: { name: true, code: true } },
+      user: { select: { email: true } },
+    },
+  });
 }

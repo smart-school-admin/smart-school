@@ -10,36 +10,27 @@ import { GraduationCapIcon } from "lucide-react";
 import { BookUserIcon } from "lucide-react";
 import { BookMarkedIcon } from "lucide-react";
 
-export default function SchoolAdminDashboardPage() {
+import db from "@/db/db";
+import { getDashboardStats } from "../../_actions/student";
+
+export default async function SchoolAdminDashboardPage() {
+  const dashboardStats = await getDashboardStats();
+
   return (
     <div className="w-full min-h-full">
-      <h1 className="text-2xl font-semibold mb-8">Dashboard</h1>
-      <div className="flex gap-4 flex-wrap">
+      <span className="text-ssGray-300">Dashboard</span>
+      <div className="flex gap-4 flex-wrap mt-4">
         <div className="w-2/3 flex flex-col flex-1 justify-between">
-          <div className="grid grid-cols-3 gap-2">
-            <StatCard>
-              <div className="flex items-center justify-center text-2xl gap-2 py-2">
-                <GraduationCapIcon className="w-8 h-8" />
-                Students
-              </div>
-              <div className="text-gray-500 text-center pb-2 text-lg">2234</div>
-            </StatCard>
-            <StatCard>
-              <div className="flex items-center justify-center text-2xl gap-2 py-2">
-                <BookUserIcon className="w-8 h-8" />
-                Teachers
-              </div>
-              <div className="text-gray-500 text-center pb-2 text-lg">72</div>
-            </StatCard>
-            <StatCard>
-              <div className="flex items-center justify-center text-2xl gap-2 py-2">
-                <BookMarkedIcon className="w-8 h-8" />
-                Accounts
-              </div>
-              <div className="text-gray-500 text-center pb-2 text-lg">
-                GHS 2000
-              </div>
-            </StatCard>
+          <div className="grid grid-cols-3 gap-2 my-2">
+            <div className="flex justify-center items-center">
+            <StatCard label="Students" value={dashboardStats.numStudents}/>
+            </div>
+            <div className="flex justify-center items-center border-e-2 border-s-2 border-blue-700">
+            <StatCard label="Teachers" value={dashboardStats.numTeachers}/>
+            </div>
+            <div className="flex justify-center items-center">
+            <StatCard label="Accounts" value={`GHS ${937}`}/>
+            </div>
           </div>
           <Card>
             <div className="w-full h-[450px]">

@@ -608,11 +608,103 @@ export async function getStudentDetails(studentId: string) {
       course: {
         select: {
           name: true,
-          code: true
+          code: true,
         },
       },
     },
   });
 
   return student;
+}
+
+/** functions to get abscences */
+export async function getTotalNumberOfAbsences(studentId: string) {
+  const session = await auth();
+
+  if (!session || !session.user || !session.user.email) {
+    redirect("/");
+  }
+
+  const teacherId = session.user.id;
+
+  const allMeetings = await db.attendance.findMany({
+    where: { teacherId: teacherId },
+  });
+
+  const totalNumberOfMeetings = (allMeetings ?? []).length;
+  const abscentMeetings = await db.attendance.findMany({
+    where: { studentId: studentId, present: false },
+  });
+  const totalAbscences = (abscentMeetings ?? []).length;
+
+  return { totalNumberOfMeetings, totalAbscences };
+}
+
+export async function getTodaysAbscences(studentId: string) {
+  const session = await auth();
+  if (!session || !session.user || !session.user.email) {
+    redirect("/");
+  }
+  const teacherId = session.user.id;
+
+  const todaysMeetings = await db.attendance.findMany({
+    where: { teacherId: teacherId, date: new Date() },
+  });
+
+  const totalTodaysMeetings = (todaysMeetings ?? []).length;
+  const abscentMeetings = await db.attendance.findMany({
+    where: { studentId: studentId, present: false, date: new Date() },
+  });
+  const totalTodaysAbscences = (abscentMeetings ?? []).length;
+
+  return { totalTodaysMeetings, totalTodaysAbscences };
+}
+
+export async function getAbscencesSummary(studentId: string) {
+  return {
+    summary: await getTotalNumberOfAbsences(studentId),
+    today: await getTodaysAbscences(studentId),
+  };
+}
+
+/** function to get total number of students in school */
+export default async function getTotalStudents(schoolId: string) {
+  return (await db.student.aggregate({
+    where: { schoolId: schoolId },
+    _count: {
+      id: true,
+    },
+  }))._count.id;
+}
+
+/** function to get total number of teachers */
+export async function getTotalTeachers(schoolId: string) {
+  return (await db.teacher.aggregate({
+    where: { schoolId: schoolId },
+    _count: {
+      id: true,
+    },
+  }))._count.id;
+}
+
+/** function to get dashboard information for school admin */
+export async function getDashboardStats() {
+  const session = await auth();
+  if (!session || !session.user || !session.user.email) {
+    redirect("/");
+  }
+
+  const adminId = session.user.id;
+
+  const school = await db.schoolAdministrator.findUnique({
+    where: { id: adminId },
+    select: { schoolId: true },
+  });
+
+  if(!school) redirect("/");
+
+  return {
+    numStudents: await getTotalStudents(school?.schoolId),
+    numTeachers: await getTotalTeachers(school?.schoolId)
+  }
 }

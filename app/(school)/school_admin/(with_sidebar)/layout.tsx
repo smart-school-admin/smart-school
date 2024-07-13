@@ -1,7 +1,6 @@
 /** component imports */
 import { Sidebar, SidebarItem } from "@/components/general/sidebar";
 import Navbar from "../_components/navbar";
-import LogoutSidebarItem from "../_components/logoutSidebarItem";
 
 /** icon imports */
 import { LayoutDashboardIcon } from "lucide-react";
@@ -21,15 +20,14 @@ export default function RootLayout({
     <section className="h-screen flex">
       <Sidebar>
         <SidebarItem href="/school_admin/dashboard">
-          <LayoutDashboardIcon /> Dashboard
+          <LayoutDashboardIcon className="w-4 h-4" /> Dashboard
         </SidebarItem>
         <SidebarItem href="/school_admin/students">
-          <BookUserIcon /> Students
+          <BookUserIcon className="w-4 h-4" /> Students
         </SidebarItem>
         <SidebarItem href="/school_admin/teachers">
-          <GraduationCapIcon /> Teachers
+          <GraduationCapIcon className="w-4 h-4" /> Teachers
         </SidebarItem>
-        <LogoutSidebarItem/>
       </Sidebar>
       <div className="h-full flex-grow flex flex-col">
         <Navbar />
