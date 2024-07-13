@@ -14,7 +14,7 @@ export default async function StudentProfilePage({
     semester: number;
     math_intensive: boolean;
   }[] = await db.$queryRaw`
-    SELECT "subjectId", "score", "passed", "semester"
+    SELECT "subjectId", "score", "passed"
     FROM (
       SELECT 
         *,

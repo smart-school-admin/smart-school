@@ -1,14 +1,13 @@
 "use client";
-import { useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent } from "@/components/ui/card";
-import ScoreCard from "../cards/scoreCard";
 import { predictGrades } from "../../school_admin/_actions/student";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
-import { ResponsiveContainer, Bar, BarChart, XAxis, YAxis } from "recharts";
 import Link from "next/link";
-import { ChevronRight, MailIcon, PhoneCallIcon } from "lucide-react";
+import { MailIcon, PhoneCallIcon } from "lucide-react";
+
+import { Drawer, DrawerTrigger } from "@/components/ui/drawer";
+import StatsDrawerContent from "./_components/statsDrawerContent";
 
 type StudentProfileProps = {
   studentData: {
@@ -48,6 +47,7 @@ export default function StudentProfile({
     math_intensive: boolean;
   }[] = [];
 
+  let avgScore = 0;
   studentData.course.subjects.forEach((subject) => {
     if (grades[subject.id]) {
       gradesExtended.push({
@@ -55,11 +55,14 @@ export default function StudentProfile({
         math_intensive: subject.math_intensive,
         subjectId: subject.id,
       });
+      avgScore += grades[subject.id].score;
     }
   });
 
+  avgScore/=gradesExtended.length;
+
   const {
-    data: response,
+    data: predictionsResponse,
     error,
     refetch,
     isError,
@@ -69,6 +72,15 @@ export default function StudentProfile({
     queryFn: async () => await predictGrades(studentData.id, gradesExtended),
     refetchOnWindowFocus: false,
   });
+
+  let predictedAvg = 0;
+
+  if(predictionsResponse?.success){
+    for(let key of Object.keys(predictionsResponse?.success?.predictions)){
+      predictedAvg+=predictionsResponse?.success?.predictions[key]
+    }
+  }
+  predictedAvg/=gradesExtended.length;
 
   if (error && error.message) toast.error(error.message);
 
@@ -107,8 +119,31 @@ export default function StudentProfile({
           <h3 className="text-2xl text-ssGray-300">SUMMARY</h3>
           <div className="flex gap-12">
             <div>
-              <span className="text-ssGray-200 text-sm">Average</span>
-              <div className="text-5xl text-green-700">78.12</div>
+              <div>
+                <span className="text-ssGray-200 text-sm">Average</span>
+
+                <div className="text-5xl text-green-700 ">{avgScore.toFixed(2)}</div>
+              </div>
+            </div>
+            <div>
+              <div>
+                <span className="text-ssGray-200 text-sm">
+                  Predicted Average
+                </span>
+                <Drawer>
+                  <DrawerTrigger asChild>
+                    <div className="text-5xl text-purple-700 cursor-pointer">
+                      {isLoading && "?"}
+                      {!isLoading && predictedAvg.toFixed(2)}
+                    </div>
+                  </DrawerTrigger>
+                  <StatsDrawerContent
+                    predictionsData={predictionsResponse?.success}
+                    grades={grades}
+                    subjects={studentData.course.subjects}
+                  />
+                </Drawer>
+              </div>
             </div>
             <div>
               <span className="text-ssGray-200 text-sm">Abscences</span>
@@ -132,23 +167,5 @@ export default function StudentProfile({
       </div>
       {/** Stats end */}
     </div>
-  );
-}
-
-function ExplanationsPlot({
-  explanations,
-}: {
-  explanations: [string, number][];
-}) {
-  const data = explanations.map((item) => ({ name: item[0], value: item[1] }));
-  console.log(data);
-  return (
-    <ResponsiveContainer width="100%" height={700}>
-      <BarChart data={data} layout="vertical" barSize={25}>
-        <XAxis dataKey="value" type="number" />
-        <YAxis dataKey="name" type="category" />
-        <Bar dataKey="value" layout="vertical" />
-      </BarChart>
-    </ResponsiveContainer>
   );
 }
