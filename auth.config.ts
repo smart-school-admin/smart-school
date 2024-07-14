@@ -1,5 +1,6 @@
 import { USER_ROLE } from "@prisma/client";
 import type { NextAuthConfig } from "next-auth";
+import { config } from "./middleware";
 
 export const authConfig = {
   session: {
@@ -29,7 +30,7 @@ export const authConfig = {
       const isTeacherPath = nextUrl.pathname.startsWith("/teacher");
       const isAdminPath = nextUrl.pathname.startsWith("/admin");
 
-      if (isAdminPath) return true;
+      if (!isSchoolAdminPath && !isTeacherPath) return true;
       if (isLoggedIn) {
         if (auth?.user.role === "schoolAdmin") {
           if (isSchoolAdminPath) return true;
@@ -44,15 +45,10 @@ export const authConfig = {
         }
       } else {
         if(isAdminPath) return true
+
         return false;
       }
 
-      // if (isOnDashboard) {
-      //   if (isLoggedIn) return true;
-      //   return false; // Redirect unauthenticated users to login page
-      // } else if (isLoggedIn) {
-      //   return Response.redirect(new URL("/school_admin/dashboard", nextUrl));
-      // }
       return true;
     },
   },

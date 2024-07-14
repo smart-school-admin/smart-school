@@ -105,7 +105,7 @@ export default function StudentProfile({
         <div className="flex justify-center items-center flex-col">
           <div className="text-center">{studentData?.index_number}</div>
           <Avatar className="w-52 h-52 my-6">
-            <AvatarImage src={studentData?.imagePath ?? ""} />
+            <AvatarImage src={studentData?.imagePath ?? ""} className="object-cover" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div>

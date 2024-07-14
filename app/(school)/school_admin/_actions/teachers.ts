@@ -94,7 +94,9 @@ export async function addTeacher(prevState: unknown, formData: FormData) {
 
 export async function getTeachers(): Promise<{
   errorMessage?: string;
-  data?: ({ subject: { name: string, code: string } } & Teacher & {user: {email: string}})[];
+  data?: ({ subject: { name: string; code: string } } & Teacher & {
+      user: { email: string };
+    })[];
   success?: boolean;
 }> {
   const session = await auth();
@@ -135,4 +137,50 @@ export async function getTeacherDetails(teacherId: string) {
       user: { select: { email: true } },
     },
   });
+}
+
+/** stats related functions */
+export async function getTotalMeetings(teacherId: string) {
+  return (
+    await db.attendance.aggregate({
+      where: { teacherId: teacherId },
+      _count: {
+        teacherId: true,
+      },
+    })
+  )._count.teacherId;
+}
+
+export async function getTotalTodaysMeetings(teacherId: string) {
+  return (
+    await db.attendance.aggregate({
+      where: { teacherId: teacherId, date: new Date() },
+      _count: {
+        teacherId: true,
+      },
+    })
+  )._count.teacherId;
+}
+
+// export async function getAvgStudentPerformance(teacherId: string){
+//   const results = await db.grade.findMany({
+//     where: {
+//       student:{
+//         schoolId: "schoolid"
+//       },
+//       subject:{
+//         Teacher:{
+          
+//         }
+//       }
+//     },
+//     select:{score: true}
+//   })
+// }
+
+export async function getTeacherProfileStats(teacherId: string){
+  return {
+    totalLessons: await getTotalMeetings(teacherId),
+    totalTodaysLessons: await getTotalTodaysMeetings(teacherId)
+  }
 }

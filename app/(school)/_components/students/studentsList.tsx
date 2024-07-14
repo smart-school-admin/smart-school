@@ -55,6 +55,7 @@ export default function StudentsList({
                   <Avatar className="w-10 h-10">
                     <AvatarImage
                       src={student.imagePath ?? "https://github.com/shadcn.png"}
+                      className="object-cover"
                     />
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>

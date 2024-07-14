@@ -63,6 +63,7 @@ export default function TeacherList({
                           src={
                             teacher.imagePath ?? "https://github.com/shadcn.png"
                           }
+                          className="object-cover"
                         />
                         <AvatarFallback>CN</AvatarFallback>
                       </Avatar>
