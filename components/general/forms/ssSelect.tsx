@@ -20,7 +20,7 @@ export default function SSSelect(
 ) {
 
   return (
-    <Select name={props.name} onValueChange={props.onValueChange} defaultValue={props.defaultValue} disabled={props.disabled}>
+    <Select name={props.name} onValueChange={props.onValueChange} defaultValue={props.defaultValue?.toString()} disabled={props.disabled}>
       <SelectTrigger>
         <SelectValue placeholder={props.placeholder} />
       </SelectTrigger>

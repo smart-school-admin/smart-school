@@ -18,7 +18,7 @@ export default async function StudentsPage() {
   return (
     <div className="w-full min-h-full">
       <h1 className="mb-8  mt-4 flex justify-between">
-        <span className="text-ssGray-300">Students</span>
+        <span className="text-ssGray-300 text-lg">Students</span>
         <Link
           href="/school_admin/add/student"
           className="text-ssPrimary-100 flex gap-2 p-2 rounded-md hover:bg-ssPrimary-100 transition-all hover:text-white"

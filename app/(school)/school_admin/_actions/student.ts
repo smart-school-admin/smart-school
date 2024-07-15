@@ -315,7 +315,7 @@ export async function getTeacherStudents(): Promise<{
 export async function uploadStudentScores(data: {
   scores: { [key: string]: number };
   passMark: number;
-  semester: number;
+  title: string;
 }) {
   const session = await auth();
 
@@ -342,7 +342,8 @@ export async function uploadStudentScores(data: {
       score: data.scores[key],
       passed: data.scores[key] > data.passMark,
       subjectId: subjectId,
-      semester: data.semester,
+      teacherId: teacherId,
+      title: data.title
     });
   }
 
@@ -669,22 +670,26 @@ export async function getAbscencesSummary(studentId: string) {
 
 /** function to get total number of students in school */
 export default async function getTotalStudents(schoolId: string) {
-  return (await db.student.aggregate({
-    where: { schoolId: schoolId },
-    _count: {
-      id: true,
-    },
-  }))._count.id;
+  return (
+    await db.student.aggregate({
+      where: { schoolId: schoolId },
+      _count: {
+        id: true,
+      },
+    })
+  )._count.id;
 }
 
 /** function to get total number of teachers */
 export async function getTotalTeachers(schoolId: string) {
-  return (await db.teacher.aggregate({
-    where: { schoolId: schoolId },
-    _count: {
-      id: true,
-    },
-  }))._count.id;
+  return (
+    await db.teacher.aggregate({
+      where: { schoolId: schoolId },
+      _count: {
+        id: true,
+      },
+    })
+  )._count.id;
 }
 
 /** function to get dashboard information for school admin */
@@ -701,10 +706,10 @@ export async function getDashboardStats() {
     select: { schoolId: true },
   });
 
-  if(!school) redirect("/");
+  if (!school) redirect("/");
 
   return {
     numStudents: await getTotalStudents(school?.schoolId),
-    numTeachers: await getTotalTeachers(school?.schoolId)
-  }
+    numTeachers: await getTotalTeachers(school?.schoolId),
+  };
 }

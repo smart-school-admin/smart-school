@@ -2,9 +2,9 @@
 
 import { z } from "zod";
 
-import { EDUCATION, GENDER, Teacher, USER_ROLE } from "@prisma/client";
+import { EDUCATION, GENDER, Student, Teacher, USER_ROLE } from "@prisma/client";
 import { auth } from "@/auth";
-import { getSchoolIdByEmail } from "./shared";
+import { getSchoolIdByEmail, predictStudentScores } from "./shared";
 import { hashPassword, saveFilePublic } from "@/app/_utils/utils";
 import { imageSchema } from "@/lib/schemas";
 import db from "@/db/db";
@@ -152,35 +152,116 @@ export async function getTotalMeetings(teacherId: string) {
 }
 
 export async function getTotalTodaysMeetings(teacherId: string) {
+  // return (
+  //   await db.attendance.aggregate({
+  //     where: { teacherId: teacherId, date: new Date() },
+  //     _count: {
+  //       teacherId: true,
+  //     },
+  //   })
+  // )._count.teacherId;
+
   return (
-    await db.attendance.aggregate({
-      where: { teacherId: teacherId, date: new Date() },
-      _count: {
-        teacherId: true,
+    await db.attendance.groupBy({
+      by: ["date", "meeting"],
+      where:{
+        teacherId: teacherId,
+        date: new Date()
       },
+      _count:{
+        id: true
+      }
     })
-  )._count.teacherId;
+  ).length
 }
 
-// export async function getAvgStudentPerformance(teacherId: string){
-//   const results = await db.grade.findMany({
-//     where: {
-//       student:{
-//         schoolId: "schoolid"
-//       },
-//       subject:{
-//         Teacher:{
-          
-//         }
-//       }
-//     },
-//     select:{score: true}
-//   })
-// }
+export async function getAvgStudentPerformance(teacherId: string) {
+  const results = await db.grade.findMany({
+    where: {
+      teacherId: teacherId,
+    },
+    select: { score: true },
+  });
+  let totalScores = 0;
+  results.forEach((item) => (totalScores += item.score));
+  return totalScores / results.length;
+}
 
-export async function getTeacherProfileStats(teacherId: string){
+export async function getAvgPredictedStudentPerformance(teacherId: string) {
+  const result = await db.grade.findMany({
+    where: { teacherId: teacherId },
+    include: {
+      student: {
+        include: {
+          _count: {
+            select: {
+              attendance: {
+                where: {
+                  present: false,
+                },
+              },
+            },
+          },
+        },
+      },
+      subject: { select: { math_intensive: true } },
+    },
+  });
+
+  const failureResponse = await db.grade.groupBy({
+    by: ["studentId"],
+    where:{
+      teacherId: teacherId,
+      passed: false
+    },
+    _count:{
+      studentId: true
+    }
+  })
+
+  const classFailures:{[key: string]: number} = {};
+  for(let item of failureResponse){
+    classFailures[item.studentId] = item._count.studentId;
+  }
+
+
+
+  const records: (Student & {
+    math_intensive: boolean;
+    previous_grade: number;
+    absences: number;
+    class_failures: number;
+  })[] = [];
+
+  for (let item of result) {
+    records.push({
+      ...item.student,
+      math_intensive: item.subject.math_intensive,
+      previous_grade: item.score,
+      absences: item.student._count.attendance,
+      class_failures: classFailures[item.studentId]
+    });
+  }
+
+  const response = await predictStudentScores(records);
+
+  if (response.success && response.data) {
+    return (
+      response.data.predictions.reduce((a, b) => a + b, 0) /
+      response.data.predictions.length
+    );
+  }
+
+  return -1;
+}
+
+export async function getTeacherProfileStats(teacherId: string) {
   return {
     totalLessons: await getTotalMeetings(teacherId),
-    totalTodaysLessons: await getTotalTodaysMeetings(teacherId)
-  }
+    totalTodaysLessons: await getTotalTodaysMeetings(teacherId),
+    averageStudentPerformance: await getAvgStudentPerformance(teacherId),
+    averagePredictedStudentPerformance: await getAvgPredictedStudentPerformance(
+      teacherId
+    ),
+  };
 }

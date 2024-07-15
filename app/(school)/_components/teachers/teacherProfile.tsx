@@ -1,17 +1,8 @@
-"use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  getAbscencesSummary,
-  predictGrades,
-} from "../../school_admin/_actions/student";
-import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { MailIcon, PhoneCallIcon } from "lucide-react";
 
-import { Drawer, DrawerTrigger } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
-import { getTotalTodaysMeetings } from "../../school_admin/_actions/teachers";
 
 type TeacherProfileProps = {
   teacherData: {
@@ -27,6 +18,8 @@ type TeacherProfileProps = {
   stats: {
     totalLessons: number;
     totalTodaysLessons: number;
+    averageStudentPerformance: number;
+    averagePredictedStudentPerformance: number;
   };
 };
 
@@ -71,19 +64,40 @@ export default function TeacherProfile({
           <h3 className="text-2xl text-ssGray-300">SUMMARY</h3>
           <div className="flex gap-12">
             <div>
-              <div>
-                <span className="text-ssGray-200 text-sm">Total Lessons</span>
+              <span className="text-ssGray-200 text-sm">Total Lessons</span>
 
-                <div className={cn("text-5xl")}>{stats.totalLessons}</div>
+              <div className={cn("text-5xl")}>{stats.totalLessons}</div>
+            </div>
+            <div>
+              <span className="text-ssGray-200 text-sm">
+                Average Performance
+              </span>
+              <div
+                className={cn(
+                  "text-5xl",
+                  stats.averageStudentPerformance > 50
+                    ? "text-green-700"
+                    : "text-red-700"
+                )}
+              >
+                {stats.averageStudentPerformance}
               </div>
             </div>
             <div>
-              <div>
-                <span className="text-ssGray-200 text-sm">
-                  Average Performance
-                </span>
-                <div className={cn("text-5xl")}>87.22</div>
-                {/* <Drawer>
+              <span className="text-ssGray-200 text-sm">
+                Predicted Average Performance
+              </span>
+              <div
+                className={cn(
+                  "text-5xl",
+                  stats.averagePredictedStudentPerformance > 50
+                    ? "text-green-700"
+                    : "text-red-700"
+                )}
+              >
+                {stats.averagePredictedStudentPerformance === -1 ? "..." : stats.averagePredictedStudentPerformance.toFixed(2)}
+              </div>
+              {/* <Drawer>
                   <DrawerTrigger asChild>
                     <div className="text-5xl text-purple-700 cursor-pointer">
                       {isLoading && "..."}
@@ -96,14 +110,8 @@ export default function TeacherProfile({
                     subjects={studentData.course.subjects}
                   />
                 </Drawer> */}
-              </div>
             </div>
-            <div>
-              {/* <span className="text-ssGray-200 text-sm">Lessons Today</span>
-              <div className="text-5xl text-black">
-                {stats.totalTodaysLessons}
-              </div> */}
-            </div>
+            <div></div>
           </div>
         </div>
         <div>

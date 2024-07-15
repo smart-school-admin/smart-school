@@ -4,7 +4,7 @@ import Navbar from "../../school_admin/_components/navbar";
 import LogoutSidebarItem from "../../school_admin/_components/logoutSidebarItem";
 
 /** icon imports */
-import { LayoutDashboardIcon } from "lucide-react";
+import { FilesIcon, LayoutDashboardIcon } from "lucide-react";
 import { BookUserIcon } from "lucide-react";
 
 /** server action imports */
@@ -24,7 +24,9 @@ export default function TeacherLayout({
         <SidebarItem href="/teacher/students">
           <BookUserIcon /> Students
         </SidebarItem>
-        <LogoutSidebarItem/>
+        <SidebarItem href="/teacher/students/scores">
+          <FilesIcon /> Scores
+        </SidebarItem>
       </Sidebar>
       <div className="h-full flex-grow flex flex-col">
         <Navbar />

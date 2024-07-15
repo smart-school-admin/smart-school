@@ -9,6 +9,7 @@ export default async function AddStudentPage() {
     select: { id: true, code: true, name: true },
   });
 
+
   return (
     <div className="w-full max-w-3xl">
       <Tabs defaultValue="single" className="w-fill">

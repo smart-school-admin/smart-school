@@ -11,8 +11,8 @@ import { getTeachers } from "../../_actions/teachers";
 export default async function TeachersPage() {
   const response = await getTeachers();
   return (
-    <div className="w-full min-h-full">
-      <h1 className="text-2xl font-semibold mb-8  mt-4 flex justify-between">
+  <div className="w-full min-h-full">
+      <h1 className="text-lg mb-8  mt-4 flex justify-between text-ssGray-300">
         Teachers
         <Link href="/school_admin/add/teacher">
           <Button>

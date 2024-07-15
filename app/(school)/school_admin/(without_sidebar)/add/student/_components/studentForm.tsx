@@ -2,6 +2,7 @@
 /** react imports */
 import { useState, useEffect } from "react";
 import { useFormState } from "react-dom";
+import { useSearchParams } from "next/navigation";
 
 /** component imports */
 import { Label } from "@/components/ui/label";
@@ -13,7 +14,7 @@ import { objectToOptions } from "@/lib/utils";
 import { ProfileImageUpload } from "@/components/general/forms/imageUpload";
 import FormError from "@/components/general/forms/formError";
 import { toast } from "sonner";
-import { CountrySelector } from "@/components/general/forms/CountryStateCitySelector";
+import { useQuery } from "@tanstack/react-query";
 
 import { Country, State, City, IState, ICity } from "country-state-city";
 
@@ -32,13 +33,22 @@ import {
 } from "@prisma/client";
 
 /** server actions */
-import { addStudent } from "@/app/(school)/school_admin/_actions/student";
+import { addStudent, getStudentDetails } from "@/app/(school)/school_admin/_actions/student";
 
 export default function StudentForm({
   courses,
 }: {
   courses: { id: number; code: string; name: string }[];
 }) {
+  const searchParams = useSearchParams();
+  const studentId = searchParams.get("studentId");
+
+  const {data:studentData,isError, isLoading, error} = useQuery({
+    queryKey: ["student-data"],
+    queryFn: async() => {if(studentId) return await getStudentDetails(studentId)},
+    refetchOnWindowFocus: false
+  })
+
   const [errors, action] = useFormState(addStudent, {});
   const countries = Country.getAllCountries();
   const [statesData, setstatesData] = useState<IState[]>();
@@ -74,10 +84,10 @@ export default function StudentForm({
   if (errors && "errorMessage" in errors) {
     toast.error(errors.errorMessage);
   }
-  // if (!errors) {
-  //   toast.success("Student added successfully");
-  //   errors = {}
-  // }
+  
+  if(studentId && isLoading){
+    return <div className="flex justify-center items-center">Fetching data ...</div>
+  }
 
   return (
     <form action={action} className="py-4 flex flex-col gap-8 w-full">
@@ -96,42 +106,42 @@ export default function StudentForm({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label>First Name</Label>
-            <Input name="first_name" />
+            <Input name="first_name" defaultValue={studentData?.first_name} />
             {errors && "first_name" in errors && (
               <FormError>{errors.first_name![0]}</FormError>
             )}
           </div>
           <div>
             <Label>Last Name</Label>
-            <Input name="last_name" />
+            <Input name="last_name" defaultValue={studentData?.last_name} />
             {errors && "last_name" in errors && (
               <FormError>{errors.last_name![0]}</FormError>
             )}
           </div>
           <div>
             <Label>Other Names</Label>
-            <Input name="other_names" />
+            <Input name="other_names" defaultValue={studentData?.other_names} />
             {errors && "other_names" in errors && (
               <FormError>{errors.other_names![0]}</FormError>
             )}
           </div>
           <div>
             <Label>Age</Label>
-            <Input name="age" type="number" min={5} max={30} />
+            <Input name="age" type="number" min={5} max={30} defaultValue={studentData?.age} />
             {errors && "age" in errors && (
               <FormError>{errors.age![0]}</FormError>
             )}
           </div>
           <div>
             <Label>Gender</Label>
-            <SSSelect options={objectToOptions(GENDER)} name="gender" />
+            <SSSelect options={objectToOptions(GENDER)} name="gender" defaultValue={studentData?.gender} />
             {errors && "gender" in errors && (
               <FormError>{errors.gender![0]}</FormError>
             )}
           </div>
           <div>
             <Label>Date of Birth</Label>
-            <DateInput name="dob" />
+            <DateInput name="dob" defaultValue={studentData?.dob.toDateString()} />
             {errors && "dob" in errors && (
               <FormError>{errors.dob![0]}</FormError>
             )}
@@ -141,6 +151,7 @@ export default function StudentForm({
             <SSSelect
               options={objectToOptions(ADDRESS_TYPE)}
               name="address_type"
+              defaultValue={studentData?.address_type}
             />
             {errors && "address_type" in errors && (
               <FormError>{errors.address_type![0]}</FormError>
@@ -180,6 +191,7 @@ export default function StudentForm({
                 value: city.name,
               }))}
               onValueChange={setCity}
+              defaultValue={studentData?.city}
             />
           </div>
         </div>
@@ -194,6 +206,7 @@ export default function StudentForm({
             <SSSelect
               name="family_size"
               options={objectToOptions(FAMILY_SIZE)}
+              defaultValue={studentData?.family_size}
             />
             {errors && "family_size" in errors && (
               <FormError>{errors.family_size![0]}</FormError>

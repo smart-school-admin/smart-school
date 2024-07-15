@@ -2,7 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { PhoneCallIcon, MailIcon, ChevronRight } from "lucide-react";
+import { PhoneCallIcon, MailIcon, ChevronRight, EditIcon } from "lucide-react";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
@@ -72,6 +72,9 @@ export default function StudentBrief({
         </Link>
         <Link href={`mailto:${data!.email}`}>
           <MailIcon className="w-6 h-6 stroke-ssGray-300" />
+        </Link>
+        <Link href={`add/student?studentId=${studentId}`} target="_blank">
+          <EditIcon className="w-6 h-6 stroke-ssGray-300" />
         </Link>
         <Link href={`students/profile/${studentId}`} target="_blank">
           <ChevronRight className="w-6 h-6 stroke-ssGray-300" />

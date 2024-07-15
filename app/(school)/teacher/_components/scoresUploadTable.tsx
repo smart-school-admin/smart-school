@@ -30,13 +30,13 @@ export default function ScoresUploadTable({
     [key: string]: number;
   }>({});
   const passMarkInputRef = useRef<HTMLInputElement>(null);
-  const semesterInputRef = useRef<HTMLInputElement>(null);
+  const titleInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmit = () => {
     const data = {
       scores: scores,
-      semester: parseInt(semesterInputRef.current!.value),
+      title: titleInputRef.current!.value,
       passMark: parseFloat(passMarkInputRef.current!.value),
     };
 
@@ -68,14 +68,10 @@ export default function ScoresUploadTable({
           />
         </div>
         <div>
-          Semester:
+          Title <small>(Give a title to your scores)</small>:
           <Input
-            ref={semesterInputRef}
-            type="number"
-            min={1}
-            max={6}
-            name="semester"
-            defaultValue={1}
+            ref={titleInputRef}
+            name="title"
           />
         </div>
       </div>
@@ -104,9 +100,9 @@ export default function ScoresUploadTable({
           ))}
         </TableBody>
       </Table>
-      <div className="flex justify-center">
-        <Button disabled={loading} onClick={handleSubmit}>
-          {loading ? "Loading" : "Submit"}
+      <div className="flex justify-center mt-6">
+        <Button disabled={loading} onClick={handleSubmit} className="w-full max-w-64">
+          {loading ? "Loading..." : "Upload"}
         </Button>
         
       </div>
