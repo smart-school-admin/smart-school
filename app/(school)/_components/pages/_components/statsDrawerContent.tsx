@@ -43,12 +43,17 @@ export default function StatsDrawerContent({
       <div className="flex justify-around items-center">
         {predictionsData && (
           <div className="flex gap-32 items-center">
-            <ExplanationsPlot explanations={predictionsData.explanations} />
-            <SubjectScoresDisplay
-              grades={grades}
-              predictions={predictionsData.predictions}
-              subjects={subjects}
-            />
+            <div>
+              <div className="text-center"><span className="text-ssPrimary-100">Red</span> = Negative Effect</div>
+              <ExplanationsPlot explanations={predictionsData.explanations} />
+            </div>
+            <div>
+              <SubjectScoresDisplay
+                grades={grades}
+                predictions={predictionsData.predictions}
+                subjects={subjects}
+              />
+            </div>
           </div>
         )}
         {!predictionsData && <span>No Data Found</span>}

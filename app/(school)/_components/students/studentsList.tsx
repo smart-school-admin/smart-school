@@ -74,7 +74,7 @@ export default function StudentsList({
       </div>
       {/** Table for students data end */}
       {/** Student summary start */}
-      <StudentBrief studentId={currentStudent} />
+      <StudentBrief studentId={currentStudent} edit={false} />
       {/** Student summary end */}
     </div>
   );

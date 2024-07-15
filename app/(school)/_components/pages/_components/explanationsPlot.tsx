@@ -12,7 +12,7 @@ export default function ExplanationsPlot({
   }));
 
   return (
-    <ResponsiveContainer width={500} height={400}>
+    <ResponsiveContainer width={600} height={400}>
       <BarChart data={data} layout="vertical" barSize={25}>
         <XAxis dataKey="value" type="number" />
         <YAxis dataKey="name" type="category" fontSize={12} width={200} />

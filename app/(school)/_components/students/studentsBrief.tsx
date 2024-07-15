@@ -11,8 +11,9 @@ import { getStudentDetails } from "../../school_admin/_actions/student";
 
 export default function StudentBrief({
   studentId,
+  edit = true,
   ...props
-}: { studentId?: string } & React.HTMLProps<HTMLElement>) {
+}: { studentId?: string, edit?: boolean } & React.HTMLProps<HTMLElement>) {
   if (!studentId)
     return (
       <div className="flex justify-center items-center">
@@ -73,9 +74,9 @@ export default function StudentBrief({
         <Link href={`mailto:${data!.email}`}>
           <MailIcon className="w-6 h-6 stroke-ssGray-300" />
         </Link>
-        <Link href={`add/student?studentId=${studentId}`} target="_blank">
+        {edit && <Link href={`add/student?studentId=${studentId}`} target="_blank">
           <EditIcon className="w-6 h-6 stroke-ssGray-300" />
-        </Link>
+        </Link>}
         <Link href={`students/profile/${studentId}`} target="_blank">
           <ChevronRight className="w-6 h-6 stroke-ssGray-300" />
         </Link>

@@ -701,7 +701,7 @@ export async function getStudentDetails(studentId: string) {
 }
 
 /** functions to get abscences */
-export async function getTotalNumberOfAbsences(studentId: string) {
+export async function getTeacherTotalNumberOfAbsences(studentId: string) {
   const session = await auth();
 
   if (!session || !session.user || !session.user.email) {
@@ -711,44 +711,94 @@ export async function getTotalNumberOfAbsences(studentId: string) {
   const teacherId = session.user.id;
 
   const allMeetings = await db.attendance.findMany({
-    where: { teacherId: teacherId },
+    where: { teacherId: teacherId, studentId: studentId },
   });
 
   const totalNumberOfMeetings = (allMeetings ?? []).length;
   const abscentMeetings = await db.attendance.findMany({
     where: { studentId: studentId, present: false },
   });
-  const totalAbscences = (abscentMeetings ?? []).length;
+  const totalAbsences = (abscentMeetings ?? []).length;
 
-  return { totalNumberOfMeetings, totalAbscences };
+  return { totalNumberOfMeetings, totalAbsences };
 }
 
-export async function getTodaysAbscences(studentId: string) {
+export async function getTeacherTodaysAbscences(studentId: string) {
   const session = await auth();
   if (!session || !session.user || !session.user.email) {
     redirect("/");
   }
   const teacherId = session.user.id;
 
-  const todaysMeetings = await db.attendance.findMany({
+  const todaysMeetings = await db.attendance.groupBy({
+    by: ["teacherId", "date"],
     where: { teacherId: teacherId, date: new Date() },
+    _count:{
+      teacherId: true
+    }
   });
 
   const totalTodaysMeetings = (todaysMeetings ?? []).length;
   const abscentMeetings = await db.attendance.findMany({
     where: { studentId: studentId, present: false, date: new Date() },
   });
-  const totalTodaysAbscences = (abscentMeetings ?? []).length;
+  const totalTodaysAbsences = (abscentMeetings ?? []).length;
 
-  return { totalTodaysMeetings, totalTodaysAbscences };
+  return { totalTodaysMeetings, totalTodaysAbsences };
 }
 
-export async function getAbscencesSummary(studentId: string) {
+export async function getTeacherAbsencesSummary(studentId: string) {
+  return {
+    summary: await getTeacherTotalNumberOfAbsences(studentId),
+    today: await getTeacherTodaysAbscences(studentId),
+  };
+}
+
+
+/** more general absences */
+export async function getTotalNumberOfAbsences(studentId: string) {
+  const session = await auth();
+
+  const allMeetings = await db.attendance.findMany({
+    where: { studentId: studentId },
+  });
+
+  const totalNumberOfMeetings = (allMeetings ?? []).length;
+  const abscentMeetings = await db.attendance.findMany({
+    where: { studentId: studentId, present: false },
+  });
+  const totalAbsences = (abscentMeetings ?? []).length;
+
+  return { totalNumberOfMeetings, totalAbsences };
+}
+
+export async function getTodaysAbscences(studentId: string) {
+
+  const todaysMeetings = await db.attendance.groupBy({
+    by: ["teacherId", "date"],
+    where: { date: new Date() },
+    _count:{
+      teacherId: true
+    }
+  });
+
+  const totalTodaysMeetings = (todaysMeetings ?? []).length;
+  const abscentMeetings = await db.attendance.findMany({
+    where: { studentId: studentId, present: false, date: new Date() },
+  });
+  const totalTodaysAbsences = (abscentMeetings ?? []).length;
+
+  return { totalTodaysMeetings, totalTodaysAbsences };
+}
+
+export async function getAbsencesSummary(studentId: string) {
   return {
     summary: await getTotalNumberOfAbsences(studentId),
     today: await getTodaysAbscences(studentId),
   };
 }
+
+
 
 /** function to get total number of students in school */
 export default async function getTotalStudents(schoolId: string) {

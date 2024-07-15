@@ -1,7 +1,7 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  getAbscencesSummary,
+  getTeacherAbsencesSummary,
   predictGrades,
 } from "../../school_admin/_actions/student";
 import { toast } from "sonner";
@@ -38,11 +38,18 @@ type StudentProfileProps = {
   grades: {
     [key: string]: { score: number; passed: boolean; semester: number };
   };
+  stats: {
+    absences: {
+      summary: { totalNumberOfMeetings: number; totalAbsences: number };
+      today: { totalTodaysMeetings: number; totalTodaysAbsences: number };
+    };
+  };
 };
 
 export default function StudentProfile({
   studentData,
   grades,
+  stats,
 }: StudentProfileProps) {
   const gradesExtended: {
     subjectId: number;
@@ -94,7 +101,7 @@ export default function StudentProfile({
     isError: abscencesIsError,
   } = useQuery({
     queryKey: ["abscences_data"],
-    queryFn: async () => await getAbscencesSummary(studentData.id),
+    queryFn: async () => await getTeacherAbsencesSummary(studentData.id),
     refetchOnWindowFocus: false,
   });
 
@@ -179,17 +186,17 @@ export default function StudentProfile({
             <div>
               <span className="text-ssGray-200 text-sm">Abscences</span>
               <div className="text-5xl text-black">
-                {abscencesSummary && (
+                {stats.absences.summary && (
                   <span
                     className={cn(
-                      abscencesSummary.summary.totalAbscences >
-                        abscencesSummary.summary.totalNumberOfMeetings / 2
+                      stats.absences.summary.totalAbsences >
+                        stats.absences.summary.totalNumberOfMeetings / 2
                         ? "text-red-700"
                         : "text-green-700"
                     )}
                   >
-                    {abscencesSummary.summary.totalAbscences}/
-                    {abscencesSummary.summary.totalNumberOfMeetings}
+                    {stats.absences.summary.totalAbsences}/
+                    {stats.absences.summary.totalNumberOfMeetings}
                   </span>
                 )}
                 {abscencesLoading && <span>...</span>}
@@ -206,14 +213,14 @@ export default function StudentProfile({
                 {abscencesSummary && (
                   <span
                     className={cn(
-                      abscencesSummary.today.totalTodaysAbscences >
-                        abscencesSummary.today.totalTodaysMeetings / 2
+                      stats.absences.today.totalTodaysAbsences >
+                      stats.absences.today.totalTodaysMeetings/ 2
                         ? "text-red-700"
                         : "text-green-700"
                     )}
                   >
-                    {abscencesSummary.today.totalTodaysAbscences}/
-                    {abscencesSummary.today.totalTodaysMeetings}
+                    {stats.absences.today.totalTodaysAbsences}/
+                    {stats.absences.today.totalTodaysMeetings}
                   </span>
                 )}
                 {abscencesLoading && <span>...</span>}
