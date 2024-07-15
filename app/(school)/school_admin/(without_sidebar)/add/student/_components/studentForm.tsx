@@ -33,7 +33,10 @@ import {
 } from "@prisma/client";
 
 /** server actions */
-import { addStudent, getStudentDetails } from "@/app/(school)/school_admin/_actions/student";
+import {
+  addStudent,
+  getStudentDetails,
+} from "@/app/(school)/school_admin/_actions/student";
 
 export default function StudentForm({
   courses,
@@ -43,11 +46,18 @@ export default function StudentForm({
   const searchParams = useSearchParams();
   const studentId = searchParams.get("studentId");
 
-  const {data:studentData,isError, isLoading, error} = useQuery({
+  const {
+    data: studentData,
+    isError,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["student-data"],
-    queryFn: async() => {if(studentId) return await getStudentDetails(studentId)},
-    refetchOnWindowFocus: false
-  })
+    queryFn: async () => {
+      if (studentId) return await getStudentDetails(studentId);
+    },
+    refetchOnWindowFocus: false,
+  });
 
   const [errors, action] = useFormState(addStudent, {});
   const countries = Country.getAllCountries();
@@ -84,9 +94,11 @@ export default function StudentForm({
   if (errors && "errorMessage" in errors) {
     toast.error(errors.errorMessage);
   }
-  
-  if(studentId && isLoading){
-    return <div className="flex justify-center items-center">Fetching data ...</div>
+
+  if (studentId && isLoading) {
+    return (
+      <div className="flex justify-center items-center">Fetching data ...</div>
+    );
   }
 
   return (
@@ -127,21 +139,34 @@ export default function StudentForm({
           </div>
           <div>
             <Label>Age</Label>
-            <Input name="age" type="number" min={5} max={30} defaultValue={studentData?.age} />
+            <Input
+              name="age"
+              type="number"
+              min={5}
+              max={30}
+              defaultValue={studentData?.age}
+            />
             {errors && "age" in errors && (
               <FormError>{errors.age![0]}</FormError>
             )}
           </div>
           <div>
             <Label>Gender</Label>
-            <SSSelect options={objectToOptions(GENDER)} name="gender" defaultValue={studentData?.gender} />
+            <SSSelect
+              options={objectToOptions(GENDER)}
+              name="gender"
+              defaultValue={studentData?.gender}
+            />
             {errors && "gender" in errors && (
               <FormError>{errors.gender![0]}</FormError>
             )}
           </div>
           <div>
             <Label>Date of Birth</Label>
-            <DateInput name="dob" defaultValue={studentData?.dob.toDateString()} />
+            <DateInput
+              name="dob"
+              defaultValue={studentData?.dob.toDateString()}
+            />
             {errors && "dob" in errors && (
               <FormError>{errors.dob![0]}</FormError>
             )}
@@ -162,7 +187,7 @@ export default function StudentForm({
             <SSSelect
               disabled
               defaultValue="GH"
-              name="city"
+              name="country"
               options={countries.map((country) => ({
                 name: country.name,
                 value: country.isoCode,
@@ -173,7 +198,13 @@ export default function StudentForm({
           <div>
             <Label>State</Label>
             <SSSelect
-              defaultValue={statesData ? statesData[0].isoCode : ""}
+              defaultValue={
+                studentData?.state
+                  ? studentData?.state
+                  : statesData
+                  ? statesData[0].isoCode
+                  : ""
+              }
               name="state"
               options={statesData?.map((state) => ({
                 name: state.name,
@@ -217,6 +248,7 @@ export default function StudentForm({
             <SSSelect
               name="parent_status"
               options={objectToOptions(PARENT_STATUS)}
+              defaultValue={studentData?.parent_status}
             />
             {errors && "parent_status" in errors && (
               <FormError>{errors.parent_status![0]}</FormError>
@@ -224,14 +256,22 @@ export default function StudentForm({
           </div>
           <div>
             <Label>Mother&apos;s Job</Label>
-            <SSSelect name="mother_job" options={objectToOptions(JOB)} />
+            <SSSelect
+              name="mother_job"
+              options={objectToOptions(JOB)}
+              defaultValue={studentData?.mother_job}
+            />
             {errors && "mother_job" in errors && (
               <FormError>{errors.mother_job![0]}</FormError>
             )}
           </div>
           <div>
             <Label>Father&apos;s Job</Label>
-            <SSSelect name="father_job" options={objectToOptions(JOB)} />
+            <SSSelect
+              name="father_job"
+              options={objectToOptions(JOB)}
+              defaultValue={studentData?.father_job}
+            />
             {errors && "father_job" in errors && (
               <FormError>{errors.father_job![0]}</FormError>
             )}
@@ -241,6 +281,7 @@ export default function StudentForm({
             <SSSelect
               name="mother_education"
               options={objectToOptions(EDUCATION)}
+              defaultValue={studentData?.mother_education}
             />
             {errors && "mother_education" in errors && (
               <FormError>{errors.mother_education![0]}</FormError>
@@ -251,11 +292,16 @@ export default function StudentForm({
             <SSSelect
               name="father_education"
               options={objectToOptions(EDUCATION)}
+              defaultValue={studentData?.father_education}
             />
           </div>
           <div>
             <Label>Guardian</Label>
-            <SSSelect name="guardian" options={objectToOptions(GUARDIAN)} />
+            <SSSelect
+              name="guardian"
+              options={objectToOptions(GUARDIAN)}
+              defaultValue={studentData?.guardian}
+            />
             {errors && "guardian" in errors && (
               <FormError>{errors.guardian![0]}</FormError>
             )}
@@ -264,7 +310,13 @@ export default function StudentForm({
             <Label>
               Family Relationship <small>(How close are you to family)</small>
             </Label>
-            <Input type="number" name="family_relationship" min={1} max={5} />
+            <Input
+              type="number"
+              name="family_relationship"
+              min={1}
+              max={5}
+              defaultValue={studentData?.family_relationship}
+            />
             {errors && "family_relationship" in errors && (
               <FormError>{errors.family_relationship![0]}</FormError>
             )}
@@ -283,6 +335,7 @@ export default function StudentForm({
             <SSSelect
               name="school_choice_reason"
               options={objectToOptions(SCHOOL_CHOICE_REASON)}
+              defaultValue={studentData?.school_choice_reason}
             />
             {errors && "school_choice_reason" in errors && (
               <FormError>{errors.school_choice_reason![0]}</FormError>
@@ -295,6 +348,7 @@ export default function StudentForm({
             <SSSelect
               name="travel_time"
               options={objectToOptions(TRAVEL_TIME)}
+              defaultValue={studentData?.travel_time}
             />
             {errors && "travel_time" in errors && (
               <FormError>{errors.travel_time![0]}</FormError>
@@ -310,6 +364,7 @@ export default function StudentForm({
                 { name: "Yes", value: "yes" },
                 { name: "No", value: "no" },
               ]}
+              defaultValue={studentData?.nursery_school ? "yes" : "no"}
             />
             {errors && "nursery_school" in errors && (
               <FormError>{errors.nursery_school![0]}</FormError>
@@ -326,6 +381,7 @@ export default function StudentForm({
                 { name: "Yes", value: "yes" },
                 { name: "No", value: "no" },
               ]}
+              defaultValue={studentData?.family_support ? "yes" : "no"}
             />
             {errors && "family_support" in errors && (
               <FormError>{errors.family_support![0]}</FormError>
@@ -341,6 +397,7 @@ export default function StudentForm({
                 { name: "Yes", value: "yes" },
                 { name: "No", value: "no" },
               ]}
+              defaultValue={studentData?.school_support ? "yes" : "no"}
             />
             {errors && "school_support" in errors && (
               <FormError>{errors.school_support![0]}</FormError>
@@ -357,6 +414,7 @@ export default function StudentForm({
                 { name: "Yes", value: "yes" },
                 { name: "No", value: "no" },
               ]}
+              defaultValue={studentData?.activities ? "yes" : "no"}
             />
             {errors && "activities" in errors && (
               <FormError>{errors.activities![0]}</FormError>
@@ -372,6 +430,7 @@ export default function StudentForm({
                 { name: "Yes", value: "yes" },
                 { name: "No", value: "no" },
               ]}
+              defaultValue={studentData?.extra_paid_classes ? "yes" : "no"}
             />
             {errors && "extra_paid_classes" in errors && (
               <FormError>{errors.extra_paid_classes![0]}</FormError>
@@ -387,6 +446,7 @@ export default function StudentForm({
                 { name: "Yes", value: "yes" },
                 { name: "No", value: "no" },
               ]}
+              defaultValue={studentData?.higher_ed ? "yes" : "no"}
             />
             {errors && "higher_ed" in errors && (
               <FormError>{errors.higher_ed![0]}</FormError>
@@ -399,6 +459,7 @@ export default function StudentForm({
             <SSSelect
               name="study_time"
               options={objectToOptions(WEEKLY_STUDY_TIME)}
+              defaultValue={studentData?.study_time}
             />
             {errors && "study_time" in errors && (
               <FormError>{errors.study_time![0]}</FormError>
@@ -421,6 +482,7 @@ export default function StudentForm({
                 { name: "Yes", value: "yes" },
                 { name: "No", value: "no" },
               ]}
+              defaultValue={studentData?.internet_access ? "yes" : "no"}
             />
             {errors && "internet_access" in errors && (
               <FormError>{errors.internet_access![0]}</FormError>
@@ -437,6 +499,7 @@ export default function StudentForm({
                 { name: "Yes", value: "yes" },
                 { name: "No", value: "no" },
               ]}
+              defaultValue={studentData?.romantic_relationship ? "yes" : "no"}
             />
             {errors && "romantic_relationship" in errors && (
               <FormError>{errors.romantic_relationship![0]}</FormError>
@@ -447,14 +510,28 @@ export default function StudentForm({
               Free Time{" "}
               <small>(On a scale of 1 to 5, how social are you)</small>
             </Label>
-            <Input type="number" name="free_time" min={1} max={5} />
+            <Input
+              type="number"
+              name="free_time"
+              min={1}
+              max={5}
+              defaultValue={studentData?.free_time}
+            />
             {errors && "free_time" in errors && (
               <FormError>{errors.free_time![0]}</FormError>
             )}
           </div>
           <div>
-            <Label>Social</Label>
-            <Input type="number" name="social" min={1} max={5} />
+            <Label>
+              Social <small>On a scale of 1 to 5, how social are you</small>
+            </Label>
+            <Input
+              type="number"
+              name="social"
+              min={1}
+              max={5}
+              defaultValue={studentData?.social}
+            />
             {errors && "social" in errors && (
               <FormError>{errors.social![0]}</FormError>
             )}
@@ -474,6 +551,7 @@ export default function StudentForm({
                 name: `${course.code}-${course.name}`,
                 value: course.id.toString(),
               }))}
+              defaultValue={studentData?.courseId.toString()}
             />
             {errors && "courseId" in errors && (
               <FormError>{errors.courseId![0]}</FormError>
@@ -481,14 +559,20 @@ export default function StudentForm({
           </div>
           <div>
             <Label>Year</Label>
-            <Input type="number" name="year" min={1} max={6} />
+            <Input
+              type="number"
+              name="year"
+              min={1}
+              max={6}
+              defaultValue={studentData?.year}
+            />
             {errors && "year" in errors && (
               <FormError>{errors.year![0]}</FormError>
             )}
           </div>
           <div className="col-span-2">
             <Label>Email</Label>
-            <Input name="email" />
+            <Input name="email" defaultValue={studentData?.email??undefined} />
             {errors && "email" in errors && (
               <FormError>{errors.email![0]}</FormError>
             )}
