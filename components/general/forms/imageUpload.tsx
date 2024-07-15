@@ -3,8 +3,8 @@ import Image from "next/image";
 import { ChangeEvent, useState, useRef } from "react";
 import { ImageIcon, XCircleIcon } from "lucide-react";
 
-export function ProfileImageUpload({ imgSrc = "", name }: { imgSrc?: string, name?:string }) {
-  const [src, setSrc] = useState<string | undefined>(imgSrc);
+export function ProfileImageUpload({ imgSrc = "", name, ...props }: { imgSrc?: string, name?:string } & React.HTMLProps<HTMLElement>) {
+  const [src, setSrc] = useState<string | undefined>(props.defaultValue as string??"");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {

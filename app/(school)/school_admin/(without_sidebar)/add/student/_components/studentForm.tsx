@@ -35,8 +35,10 @@ import {
 /** server actions */
 import {
   addStudent,
+  updateStudentDetails,
   getStudentDetails,
 } from "@/app/(school)/school_admin/_actions/student";
+import { stat } from "fs";
 
 export default function StudentForm({
   courses,
@@ -59,7 +61,8 @@ export default function StudentForm({
     refetchOnWindowFocus: false,
   });
 
-  const [errors, action] = useFormState(addStudent, {});
+
+  const [state, action] = useFormState(studentId ? updateStudentDetails.bind(null, studentId, studentData?.imagePath??undefined) : addStudent, {});
   const countries = Country.getAllCountries();
   const [statesData, setstatesData] = useState<IState[]>();
   const [citiesData, setCitiesData] = useState<ICity[]>();
@@ -91,8 +94,13 @@ export default function StudentForm({
     citiesData && setCity(citiesData[0].name);
   }, [citiesData]);
 
-  if (errors && "errorMessage" in errors) {
-    toast.error(errors.errorMessage);
+  if (!state?.success && state?.errorMessage) {
+    toast.error(state.errorMessage);
+  }
+
+  if(state?.success){
+    toast.success(studentId ? "Successfully updated profile" : "Successfully added student")
+    delete state.success;
   }
 
   if (studentId && isLoading) {
@@ -106,10 +114,8 @@ export default function StudentForm({
       {/************ PROFILE IMAGE [start]****************/}
       <div className="w-full flex justify-center py-4 flex-col items-center gap-4">
         Student Image
-        <ProfileImageUpload name="image" />
-        {errors && "image" in errors && (
-          <FormError>{errors.image![0]}</FormError>
-        )}
+        <ProfileImageUpload name="image" defaultValue={studentData?.imagePath as string} />
+        <FormError>{state?.fieldErrors?.image}</FormError>
       </div>
       {/************ PROFILE IMAGE [end]****************/}
       {/************ PERSONAL INFORMATION [start]****************/}
@@ -119,23 +125,17 @@ export default function StudentForm({
           <div>
             <Label>First Name</Label>
             <Input name="first_name" defaultValue={studentData?.first_name} />
-            {errors && "first_name" in errors && (
-              <FormError>{errors.first_name![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.first_name}</FormError>
           </div>
           <div>
             <Label>Last Name</Label>
             <Input name="last_name" defaultValue={studentData?.last_name} />
-            {errors && "last_name" in errors && (
-              <FormError>{errors.last_name![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.last_name}</FormError>
           </div>
           <div>
             <Label>Other Names</Label>
             <Input name="other_names" defaultValue={studentData?.other_names} />
-            {errors && "other_names" in errors && (
-              <FormError>{errors.other_names![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.other_names}</FormError>
           </div>
           <div>
             <Label>Age</Label>
@@ -146,9 +146,7 @@ export default function StudentForm({
               max={30}
               defaultValue={studentData?.age}
             />
-            {errors && "age" in errors && (
-              <FormError>{errors.age![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.age}</FormError>
           </div>
           <div>
             <Label>Gender</Label>
@@ -157,9 +155,7 @@ export default function StudentForm({
               name="gender"
               defaultValue={studentData?.gender}
             />
-            {errors && "gender" in errors && (
-              <FormError>{errors.gender![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.gender}</FormError>
           </div>
           <div>
             <Label>Date of Birth</Label>
@@ -167,9 +163,7 @@ export default function StudentForm({
               name="dob"
               defaultValue={studentData?.dob.toDateString()}
             />
-            {errors && "dob" in errors && (
-              <FormError>{errors.dob![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.dob}</FormError>
           </div>
           <div className="col-span-2">
             <Label>Address Type</Label>
@@ -178,9 +172,7 @@ export default function StudentForm({
               name="address_type"
               defaultValue={studentData?.address_type}
             />
-            {errors && "address_type" in errors && (
-              <FormError>{errors.address_type![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.address_type}</FormError>
           </div>
           <div>
             <Label>Country</Label>
@@ -212,6 +204,7 @@ export default function StudentForm({
               }))}
               onValueChange={setStateCode}
             />
+            <FormError>{state?.fieldErrors?.state}</FormError>
           </div>
           <div>
             <Label>City</Label>
@@ -224,6 +217,7 @@ export default function StudentForm({
               onValueChange={setCity}
               defaultValue={studentData?.city}
             />
+            <FormError>{state?.fieldErrors?.city}</FormError>
           </div>
         </div>
       </div>
@@ -239,9 +233,7 @@ export default function StudentForm({
               options={objectToOptions(FAMILY_SIZE)}
               defaultValue={studentData?.family_size}
             />
-            {errors && "family_size" in errors && (
-              <FormError>{errors.family_size![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.family_size}</FormError>
           </div>
           <div>
             <Label>Parent Status</Label>
@@ -250,9 +242,7 @@ export default function StudentForm({
               options={objectToOptions(PARENT_STATUS)}
               defaultValue={studentData?.parent_status}
             />
-            {errors && "parent_status" in errors && (
-              <FormError>{errors.parent_status![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.parent_status}</FormError>
           </div>
           <div>
             <Label>Mother&apos;s Job</Label>
@@ -261,9 +251,7 @@ export default function StudentForm({
               options={objectToOptions(JOB)}
               defaultValue={studentData?.mother_job}
             />
-            {errors && "mother_job" in errors && (
-              <FormError>{errors.mother_job![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.mother_job}</FormError>
           </div>
           <div>
             <Label>Father&apos;s Job</Label>
@@ -272,9 +260,7 @@ export default function StudentForm({
               options={objectToOptions(JOB)}
               defaultValue={studentData?.father_job}
             />
-            {errors && "father_job" in errors && (
-              <FormError>{errors.father_job![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.father_job}</FormError>
           </div>
           <div>
             <Label>Mother&apos;s Education</Label>
@@ -283,9 +269,7 @@ export default function StudentForm({
               options={objectToOptions(EDUCATION)}
               defaultValue={studentData?.mother_education}
             />
-            {errors && "mother_education" in errors && (
-              <FormError>{errors.mother_education![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.mother_education}</FormError>
           </div>
           <div>
             <Label>Father&apos;s Education</Label>
@@ -294,6 +278,7 @@ export default function StudentForm({
               options={objectToOptions(EDUCATION)}
               defaultValue={studentData?.father_education}
             />
+            <FormError>{state?.fieldErrors?.father_education}</FormError>
           </div>
           <div>
             <Label>Guardian</Label>
@@ -302,9 +287,7 @@ export default function StudentForm({
               options={objectToOptions(GUARDIAN)}
               defaultValue={studentData?.guardian}
             />
-            {errors && "guardian" in errors && (
-              <FormError>{errors.guardian![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.guardian}</FormError>
           </div>
           <div>
             <Label>
@@ -317,9 +300,7 @@ export default function StudentForm({
               max={5}
               defaultValue={studentData?.family_relationship}
             />
-            {errors && "family_relationship" in errors && (
-              <FormError>{errors.family_relationship![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.family_relationship}</FormError>
           </div>
         </div>
       </div>
@@ -337,9 +318,7 @@ export default function StudentForm({
               options={objectToOptions(SCHOOL_CHOICE_REASON)}
               defaultValue={studentData?.school_choice_reason}
             />
-            {errors && "school_choice_reason" in errors && (
-              <FormError>{errors.school_choice_reason![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.school_choice_reason}</FormError>
           </div>
           <div>
             <Label>
@@ -350,9 +329,7 @@ export default function StudentForm({
               options={objectToOptions(TRAVEL_TIME)}
               defaultValue={studentData?.travel_time}
             />
-            {errors && "travel_time" in errors && (
-              <FormError>{errors.travel_time![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.travel_time}</FormError>
           </div>
           <div>
             <Label>
@@ -366,9 +343,7 @@ export default function StudentForm({
               ]}
               defaultValue={studentData?.nursery_school ? "yes" : "no"}
             />
-            {errors && "nursery_school" in errors && (
-              <FormError>{errors.nursery_school![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.nursery_school}</FormError>
           </div>
           <div>
             <Label>
@@ -383,9 +358,7 @@ export default function StudentForm({
               ]}
               defaultValue={studentData?.family_support ? "yes" : "no"}
             />
-            {errors && "family_support" in errors && (
-              <FormError>{errors.family_support![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.family_support}</FormError>
           </div>
           <div>
             <Label>
@@ -399,9 +372,7 @@ export default function StudentForm({
               ]}
               defaultValue={studentData?.school_support ? "yes" : "no"}
             />
-            {errors && "school_support" in errors && (
-              <FormError>{errors.school_support![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.school_support}</FormError>
           </div>
           <div>
             <Label>
@@ -416,9 +387,7 @@ export default function StudentForm({
               ]}
               defaultValue={studentData?.activities ? "yes" : "no"}
             />
-            {errors && "activities" in errors && (
-              <FormError>{errors.activities![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.activities}</FormError>
           </div>
           <div>
             <Label>
@@ -432,9 +401,7 @@ export default function StudentForm({
               ]}
               defaultValue={studentData?.extra_paid_classes ? "yes" : "no"}
             />
-            {errors && "extra_paid_classes" in errors && (
-              <FormError>{errors.extra_paid_classes![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.extra_paid_classes}</FormError>
           </div>
           <div>
             <Label>
@@ -448,9 +415,7 @@ export default function StudentForm({
               ]}
               defaultValue={studentData?.higher_ed ? "yes" : "no"}
             />
-            {errors && "higher_ed" in errors && (
-              <FormError>{errors.higher_ed![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.higher_ed}</FormError>
           </div>
           <div className="col-span-2">
             <Label>
@@ -461,9 +426,7 @@ export default function StudentForm({
               options={objectToOptions(WEEKLY_STUDY_TIME)}
               defaultValue={studentData?.study_time}
             />
-            {errors && "study_time" in errors && (
-              <FormError>{errors.study_time![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.study_time}</FormError>
           </div>
         </div>
       </div>
@@ -484,9 +447,7 @@ export default function StudentForm({
               ]}
               defaultValue={studentData?.internet_access ? "yes" : "no"}
             />
-            {errors && "internet_access" in errors && (
-              <FormError>{errors.internet_access![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.internet_access}</FormError>
           </div>
           <div>
             <Label>
@@ -501,9 +462,7 @@ export default function StudentForm({
               ]}
               defaultValue={studentData?.romantic_relationship ? "yes" : "no"}
             />
-            {errors && "romantic_relationship" in errors && (
-              <FormError>{errors.romantic_relationship![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.romantic_relationship}</FormError>
           </div>
           <div>
             <Label>
@@ -517,9 +476,7 @@ export default function StudentForm({
               max={5}
               defaultValue={studentData?.free_time}
             />
-            {errors && "free_time" in errors && (
-              <FormError>{errors.free_time![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.free_time}</FormError>
           </div>
           <div>
             <Label>
@@ -532,9 +489,7 @@ export default function StudentForm({
               max={5}
               defaultValue={studentData?.social}
             />
-            {errors && "social" in errors && (
-              <FormError>{errors.social![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.social}</FormError>
           </div>
         </div>
       </div>
@@ -553,9 +508,7 @@ export default function StudentForm({
               }))}
               defaultValue={studentData?.courseId.toString()}
             />
-            {errors && "courseId" in errors && (
-              <FormError>{errors.courseId![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.courseId}</FormError>
           </div>
           <div>
             <Label>Year</Label>
@@ -566,16 +519,17 @@ export default function StudentForm({
               max={6}
               defaultValue={studentData?.year}
             />
-            {errors && "year" in errors && (
-              <FormError>{errors.year![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.year}</FormError>
           </div>
-          <div className="col-span-2">
+          <div>
             <Label>Email</Label>
             <Input name="email" defaultValue={studentData?.email??undefined} />
-            {errors && "email" in errors && (
-              <FormError>{errors.email![0]}</FormError>
-            )}
+            <FormError>{state?.fieldErrors?.email}</FormError>
+          </div>
+          <div>
+            <Label>Phone Number</Label>
+            <Input name="phone_number" defaultValue={studentData?.phone_number??undefined} />
+            <FormError>{state?.fieldErrors?.phone_number}</FormError>
           </div>
         </div>
       </div>

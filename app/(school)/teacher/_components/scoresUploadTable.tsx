@@ -21,6 +21,7 @@ export default function ScoresUploadTable({
 }: {
   students: {
     id: string;
+    index_number: number;
     first_name: string;
     last_name: string;
     course: { name: string; code: string };
@@ -44,7 +45,9 @@ export default function ScoresUploadTable({
     uploadStudentScores(data)
       .then((response) => {
         if (response?.success)
-          toast.success(`Scores for ${response.data} students successfully uploaded`);
+          toast.success(
+            `Scores for ${response.data} students successfully uploaded`
+          );
         else toast.error(response?.errorMessage);
       })
       .catch((error: any) => {
@@ -69,10 +72,7 @@ export default function ScoresUploadTable({
         </div>
         <div>
           Title <small>(Give a title to your scores)</small>:
-          <Input
-            ref={titleInputRef}
-            name="title"
-          />
+          <Input ref={titleInputRef} name="title" />
         </div>
       </div>
       <Table>
@@ -80,6 +80,7 @@ export default function ScoresUploadTable({
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
+            <TableHead>Index Number</TableHead>
             <TableHead>Course</TableHead>
             <TableHead>Subject</TableHead>
             <TableHead>Score</TableHead>
@@ -90,6 +91,7 @@ export default function ScoresUploadTable({
             <StudentScoreItem
               key={index}
               studentId={student.id}
+              indexNumber={student.index_number}
               firstName={student.first_name}
               lastName={student.last_name}
               courseCode={student.course.code}
@@ -101,10 +103,13 @@ export default function ScoresUploadTable({
         </TableBody>
       </Table>
       <div className="flex justify-center mt-6">
-        <Button disabled={loading} onClick={handleSubmit} className="w-full max-w-64">
+        <Button
+          disabled={loading}
+          onClick={handleSubmit}
+          className="w-full max-w-64"
+        >
           {loading ? "Loading..." : "Upload"}
         </Button>
-        
       </div>
     </div>
   );
@@ -112,6 +117,7 @@ export default function ScoresUploadTable({
 
 function StudentScoreItem({
   studentId,
+  indexNumber,
   firstName,
   lastName,
   courseCode,
@@ -120,6 +126,7 @@ function StudentScoreItem({
   added,
 }: {
   studentId: string;
+  indexNumber: number;
   firstName: string;
   lastName: string;
   courseCode: string;
@@ -141,6 +148,9 @@ function StudentScoreItem({
     <TableRow>
       <TableCell>
         {firstName} {lastName}
+      </TableCell>
+      <TableCell>
+        {indexNumber}
       </TableCell>
       <TableCell>
         {courseCode}-{courseName}
@@ -177,4 +187,3 @@ function StudentScoreItem({
     </TableRow>
   );
 }
-

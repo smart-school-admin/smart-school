@@ -32,9 +32,12 @@ import { TypeOf, z } from "zod";
 
 /** functions */
 import { getSchoolIdByEmail, getSessionId } from "./shared";
-import { ML_API_ENDPOINTS } from "@/lib/endpoints";
 import path from "path";
 import axios, { AxiosError } from "axios";
+
+/** constants */
+import { ML_API_ENDPOINTS } from "@/lib/endpoints";
+import { FILE } from "@/lib/constants";
 
 /** models */
 import { ServerActionReturnModel } from "@/lib/models";
@@ -44,8 +47,8 @@ const validMessage = "Please select valid value";
 /** schema for student data */
 const studentSchema = z.object({
   // image
-  image: imageSchema.refine((file) => file.size < 2 * 1024 * 1024, {
-    message: "Image file should be at most 2MB",
+  image: imageSchema.refine((file) => FILE.MAX_FILE_SIZE_BYTES, {
+    message: FILE.MAX_FILE_SIZE_ERR_MSG,
   }),
   // personal information
   first_name: z.string().min(1, { message: requiredMessage }),
@@ -76,37 +79,37 @@ const studentSchema = z.object({
   nursery_school: z
     .string()
     .min(1, { message: requiredMessage })
-    .transform((value) => (value === "Yes" ? true : false)),
+    .transform((value) => (value === "yes" ? true : false)),
   family_support: z
     .string()
     .min(1, { message: requiredMessage })
-    .transform((value) => (value === "Yes" ? true : false)),
+    .transform((value) => (value === "yes" ? true : false)),
   school_support: z
     .string()
     .min(1, { message: requiredMessage })
-    .transform((value) => (value === "Yes" ? true : false)),
+    .transform((value) => (value === "yes" ? true : false)),
   activities: z
     .string()
     .min(1, { message: requiredMessage })
-    .transform((value) => (value === "Yes" ? true : false)),
+    .transform((value) => (value === "yes" ? true : false)),
   extra_paid_classes: z
     .string()
     .min(1, { message: requiredMessage })
-    .transform((value) => (value === "Yes" ? true : false)),
+    .transform((value) => (value === "yes" ? true : false)),
   higher_ed: z
     .string()
     .min(1, { message: requiredMessage })
-    .transform((value) => (value === "Yes" ? true : false)),
+    .transform((value) => (value === "yes" ? true : false)),
   study_time: z.nativeEnum(WEEKLY_STUDY_TIME),
   // other information
   internet_access: z
     .string()
     .min(1, { message: requiredMessage })
-    .transform((value) => (value === "Yes" ? true : false)),
+    .transform((value) => (value === "yes" ? true : false)),
   romantic_relationship: z
     .string()
     .min(1, { message: requiredMessage })
-    .transform((value) => (value === "Yes" ? true : false)),
+    .transform((value) => (value === "yes" ? true : false)),
   social: z.coerce
     .number()
     .min(1, { message: "Value must be at least 1" })
@@ -123,26 +126,40 @@ const studentSchema = z.object({
     .min(1, { message: "At least year 1" })
     .max(6, { message: "At most year 6" }),
   email: z.string().email(),
+  phone_number: z
+    .string()
+    .refine((value) =>
+      /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/.test(value)
+    )
+    .optional(),
 });
 
 /** function to add a single student */
-export async function addStudent(prevState: unknown, formData: FormData) {
+export async function addStudent(
+  prevState: unknown,
+  formData: FormData
+): Promise<{
+  success?: boolean;
+  errorMessage?: string;
+  fieldErrors?: z.inferFlattenedErrors<typeof studentSchema>["fieldErrors"];
+  data?: any;
+}> {
   const session = await auth();
 
   if (!session || !session.user || !session.user.email) {
-    return { errorMessage: "No user in session" };
+    return { errorMessage: "No user in session", success: false };
   }
 
   const schoolId = await getSchoolIdByEmail(session.user.email);
 
-  if (!schoolId) return { errorMessage: "School not found" };
+  if (!schoolId) return { errorMessage: "School not found", success: false };
 
   const validationResult = studentSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
 
   if (!validationResult.success)
-    return validationResult.error.formErrors.fieldErrors;
+    return { fieldErrors: validationResult.error.formErrors.fieldErrors };
 
   const data = validationResult.data;
 
@@ -156,7 +173,16 @@ export async function addStudent(prevState: unknown, formData: FormData) {
   let { image, ...studentData } = data;
   const cleaned = { ...studentData, imagePath, schoolId };
 
-  await db.student.create({ data: cleaned });
+  try {
+    await db.student.create({ data: cleaned });
+  } catch (error: any) {
+    return {
+      success: false,
+      errorMessage: error.message ? error.message : "Something went wrong",
+    };
+  }
+
+  return { success: true };
 }
 
 /** function to get all students of school */
@@ -226,11 +252,67 @@ export async function addStudentsFromFile(
   return {};
 }
 
-/** function to get students by Id and by school */
-// type TeacherStudent = {
-//   first_name: string;
-//   last_name: string;
-// }
+/** function to update student */
+const updateStudentSchema = studentSchema.extend({
+  image: imageSchema
+    .refine((file) => FILE.MAX_FILE_SIZE_BYTES, {
+      message: FILE.MAX_FILE_SIZE_ERR_MSG,
+    })
+    .optional(),
+});
+export async function updateStudentDetails(
+  studentId: string,
+  previousImage: string | undefined,
+  prevState: unknown,
+  formData: FormData
+): Promise<{
+  success?: boolean;
+  fieldErrors?: z.inferFlattenedErrors<
+    typeof updateStudentSchema
+  >["fieldErrors"];
+  errorMessage?: string;
+}> {
+  const validationResult = updateStudentSchema.safeParse(
+    Object.fromEntries(formData)
+  );
+  if (!validationResult.success) {
+    return {
+      fieldErrors: validationResult.error.formErrors.fieldErrors,
+      success: false,
+    };
+  }
+
+  try {
+    let imagePath: string | undefined = previousImage;
+
+    if (validationResult.data.image) {
+      const { image } = validationResult.data;
+      imagePath = await saveFilePublic(
+        "/students/",
+        `${validationResult.data.first_name}_${validationResult.data.last_name}_${image.name}`,
+        image
+      );
+    }
+
+    const { image, ...data } = validationResult.data;
+    await db.student.update({
+      where: { id: studentId },
+      data: {
+        ...data,
+        imagePath: imagePath,
+      },
+    });
+  } catch (error: any) {
+    return {
+      errorMessage: error.message ? error.message : "Something went wrong",
+      success: false,
+    };
+  }
+
+  return { success: true };
+}
+
+
 export async function getTeacherStudents(): Promise<{
   errorMessage?: string;
   data?: {
@@ -343,7 +425,7 @@ export async function uploadStudentScores(data: {
       passed: data.scores[key] > data.passMark,
       subjectId: subjectId,
       teacherId: teacherId,
-      title: data.title
+      title: data.title,
     });
   }
 

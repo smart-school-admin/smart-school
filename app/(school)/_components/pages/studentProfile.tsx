@@ -64,7 +64,7 @@ export default function StudentProfile({
     }
   });
 
-  avgScore /= gradesExtended.length;
+  avgScore = gradesExtended.length > 0 ? avgScore / gradesExtended.length : -1;
 
   const {
     data: predictionsResponse,
@@ -84,7 +84,8 @@ export default function StudentProfile({
       predictedAvg += predictionsResponse?.success?.predictions[key];
     }
   }
-  predictedAvg /= gradesExtended.length;
+  predictedAvg =
+    gradesExtended.length > 0 ? predictedAvg / gradesExtended.length : -1;
 
   const {
     data: abscencesSummary,
@@ -105,7 +106,10 @@ export default function StudentProfile({
         <div className="flex justify-center items-center flex-col">
           <div className="text-center">{studentData?.index_number}</div>
           <Avatar className="w-52 h-52 my-6">
-            <AvatarImage src={studentData?.imagePath ?? ""} className="object-cover" />
+            <AvatarImage
+              src={studentData?.imagePath ?? ""}
+              className="object-cover"
+            />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div>
@@ -143,7 +147,9 @@ export default function StudentProfile({
                     avgScore > 50 ? "text-green-700" : "text-red-700"
                   )}
                 >
-                  {avgScore.toFixed(2)}
+                  {isLoading && "..."}
+                  {!isLoading && avgScore >= 0 && avgScore.toFixed(2)}
+                  {!isLoading && avgScore === -1 && "?"}
                 </div>
               </div>
             </div>
@@ -156,7 +162,10 @@ export default function StudentProfile({
                   <DrawerTrigger asChild>
                     <div className="text-5xl text-purple-700 cursor-pointer">
                       {isLoading && "..."}
-                      {!isLoading && predictedAvg.toFixed(2)}
+                      {!isLoading &&
+                        predictedAvg >= 0 &&
+                        predictedAvg.toFixed(2)}
+                      {!isLoading && predictedAvg === -1 && "?"}
                     </div>
                   </DrawerTrigger>
                   <StatsDrawerContent
