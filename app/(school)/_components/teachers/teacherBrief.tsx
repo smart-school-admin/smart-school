@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { PhoneCallIcon, MailIcon, ChevronRight } from "lucide-react";
+import { PhoneCallIcon, MailIcon, ChevronRight, EditIcon } from "lucide-react";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
@@ -69,11 +69,16 @@ export default function TeacherBrief({
 
       {/** Icons */}
       <div className="flex justify-center gap-4">
-        {data!.phone_number && <Link href={`tel:${data!.phone_number}`}>
-          <PhoneCallIcon className="w-6 h-6 stroke-ssGray-300" />
-        </Link>}
+        {data!.phone_number && (
+          <Link href={`tel:${data!.phone_number}`}>
+            <PhoneCallIcon className="w-6 h-6 stroke-ssGray-300" />
+          </Link>
+        )}
         <Link href={`mailto:${data!.user.email}`}>
           <MailIcon className="w-6 h-6 stroke-ssGray-300" />
+        </Link>
+        <Link href={`add/teacher?teacherId=${teacherId}`} target="_blank">
+          <EditIcon className="w-6 h-6 stroke-ssGray-300" />
         </Link>
         <Link href={`teachers/profile/${teacherId}`} target="_blank">
           <ChevronRight className="w-6 h-6 stroke-ssGray-300" />

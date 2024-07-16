@@ -30,14 +30,15 @@ export const authConfig = {
       const isTeacherPath = nextUrl.pathname.startsWith("/teacher");
       const isAdminPath = nextUrl.pathname.startsWith("/admin");
 
-      if (!isSchoolAdminPath && !isTeacherPath) return true;
+
       if (isLoggedIn) {
         if (auth?.user.role === "schoolAdmin") {
           if (isSchoolAdminPath) return true;
-          else
+          else{
             return Response.redirect(
               new URL("/school_admin/dashboard", nextUrl)
             );
+          }
         }
         if (auth?.user.role === "teacher") {
           if (isTeacherPath) return true;

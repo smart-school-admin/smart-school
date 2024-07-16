@@ -20,14 +20,41 @@ import { Country, State, City, IState, ICity } from "country-state-city";
 import { GENDER, EDUCATION } from "@prisma/client";
 
 /** server actions */
-import { addTeacher } from "@/app/(school)/school_admin/_actions/teachers";
+import {
+  addTeacher,
+  getTeacherDetails,
+  updateTeacher,
+} from "@/app/(school)/school_admin/_actions/teachers";
+import { redirect, useSearchParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 
 export default function TeacherForm({
   subjects,
 }: {
   subjects: { id: number; code: string; name: string }[];
 }) {
-  const [errors, action] = useFormState(addTeacher, {});
+  const searchParams = useSearchParams();
+  const teacherId = searchParams.get("teacherId");
+
+  const {
+    data: teacherData,
+    isError,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["teacher-data"],
+    queryFn: async () => {
+      if (teacherId) return await getTeacherDetails(teacherId);
+    },
+    refetchOnWindowFocus: false,
+  });
+
+  const [state, action] = useFormState(
+    teacherId
+      ? updateTeacher.bind(null, teacherId, teacherData?.imagePath)
+      : addTeacher,
+    {}
+  );
   const countries = Country.getAllCountries();
   const [statesData, setstatesData] = useState<IState[]>();
   const [citiesData, setCitiesData] = useState<ICity[]>();
@@ -59,9 +86,25 @@ export default function TeacherForm({
     citiesData && setCity(citiesData[0].name);
   }, [citiesData]);
 
-  if (errors && "errorMessage" in errors) {
-    toast.error(errors.errorMessage);
-    delete errors.errorMessage;
+  if (!state.success && state.errorMessage) {
+    toast.error(state.errorMessage);
+    delete state.errorMessage;
+  }
+
+  if (state?.success) {
+    setTimeout(() => {
+      redirect("/school_admin/teachers");
+    }, 1000);
+    toast.success(
+      teacherId ? "Successfully updated profile" : "Successfully added teacher"
+    );
+    delete state.success;
+  }
+
+  if (teacherId && isLoading) {
+    return (
+      <div className="flex justify-center items-center">Fetching data ...</div>
+    );
   }
 
   return (
@@ -69,10 +112,11 @@ export default function TeacherForm({
       {/************ PROFILE IMAGE [start]****************/}
       <div className="w-full flex justify-center py-4 flex-col items-center gap-4">
         Teacher's Image
-        <ProfileImageUpload name="image" />
-        {errors && "image" in errors && (
-          <FormError>{errors.image![0]}</FormError>
-        )}
+        <ProfileImageUpload
+          name="image"
+          defaultValue={teacherData?.imagePath}
+        />
+        <FormError>{state.fieldErrors?.image}</FormError>
       </div>
       {/************ PROFILE IMAGE [end]****************/}
       {/************ PERSONAL INFORMATION [start]****************/}
@@ -81,50 +125,51 @@ export default function TeacherForm({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label>First Name</Label>
-            <Input name="first_name" />
-            {errors && "first_name" in errors && (
-              <FormError>{errors.first_name![0]}</FormError>
-            )}
+            <Input name="first_name" defaultValue={teacherData?.first_name} />
+            <FormError>{state.fieldErrors?.first_name}</FormError>
           </div>
           <div>
             <Label>Last Name</Label>
-            <Input name="last_name" />
-            {errors && "last_name" in errors && (
-              <FormError>{errors.last_name![0]}</FormError>
-            )}
+            <Input name="last_name" defaultValue={teacherData?.last_name} />
+            <FormError>{state.fieldErrors?.last_name}</FormError>
           </div>
           <div>
             <Label>Other Names</Label>
-            <Input name="other_names" />
-            {errors && "other_names" in errors && (
-              <FormError>{errors.other_names![0]}</FormError>
-            )}
+            <Input name="other_names" defaultValue={teacherData?.other_names} />
+            <FormError>{state.fieldErrors?.other_names}</FormError>
           </div>
           <div>
             <Label>Age</Label>
-            <Input name="age" type="number" min={5} max={30} />
-            {errors && "age" in errors && (
-              <FormError>{errors.age![0]}</FormError>
-            )}
+            <Input
+              name="age"
+              type="number"
+              min={5}
+              max={50}
+              defaultValue={teacherData?.age}
+            />
+            <FormError>{state.fieldErrors?.age}</FormError>
           </div>
           <div>
             <Label>Gender</Label>
-            <SSSelect options={objectToOptions(GENDER)} name="gender" />
-            {errors && "gender" in errors && (
-              <FormError>{errors.gender![0]}</FormError>
-            )}
+            <SSSelect
+              options={objectToOptions(GENDER)}
+              name="gender"
+              defaultValue={teacherData?.gender}
+            />
+            <FormError>{state.fieldErrors?.gender}</FormError>
           </div>
           <div>
             <Label>Date of Birth</Label>
-            <DateInput name="dob" />
-            {errors && "dob" in errors && (
-              <FormError>{errors.dob![0]}</FormError>
-            )}
+            <DateInput
+              name="dob"
+              defaultValue={teacherData?.dob.toDateString()}
+            />
+            <FormError>{state.fieldErrors?.dob}</FormError>
           </div>
           <div>
             <Label>Country</Label>
             <SSSelect
-              defaultValue="GH"
+              defaultValue={teacherData?.country ? teacherData.state : "GH"}
               name="country"
               options={countries.map((country) => ({
                 name: country.name,
@@ -132,14 +177,18 @@ export default function TeacherForm({
               }))}
               onValueChange={setCountryCode}
             />
-            {errors && "country" in errors && (
-              <FormError>{errors.country![0]}</FormError>
-            )}
+            <FormError>{state.fieldErrors?.country}</FormError>
           </div>
           <div>
             <Label>State</Label>
             <SSSelect
-              defaultValue={statesData ? statesData[0].isoCode : ""}
+              defaultValue={
+                teacherData?.state
+                  ? teacherData?.state
+                  : statesData
+                  ? statesData[0].isoCode
+                  : ""
+              }
               name="state"
               options={statesData?.map((state) => ({
                 name: state.name,
@@ -147,17 +196,20 @@ export default function TeacherForm({
               }))}
               onValueChange={setStateCode}
             />
+            <FormError>{state.fieldErrors?.state}</FormError>
           </div>
           <div>
             <Label>City</Label>
             <SSSelect
               name="city"
+              defaultValue={teacherData?.city}
               options={citiesData?.map((city) => ({
                 name: city.name,
                 value: city.name,
               }))}
               onValueChange={setCity}
             />
+            <FormError>{state.fieldErrors?.city}</FormError>
           </div>
         </div>
       </div>
@@ -170,34 +222,41 @@ export default function TeacherForm({
             <SSSelect
               name="educational_level"
               options={objectToOptions(EDUCATION)}
+              defaultValue={teacherData?.educational_level}
             />
-            {errors && "educational_level" in errors && (
-              <FormError>{errors.educational_level![0]}</FormError>
-            )}
+            <FormError>{state.fieldErrors?.educational_level}</FormError>
           </div>
           <div>
             <Label>Length of Service</Label>
-            <Input type="number" min={0} name="length_of_service" />
-            {errors && "length_of_service" in errors && (
-              <FormError>{errors.length_of_service![0]}</FormError>
-            )}
+            <Input
+              type="number"
+              min={0}
+              name="length_of_service"
+              defaultValue={teacherData?.length_of_service}
+            />
+            <FormError>{state.fieldErrors?.length_of_service}</FormError>
           </div>
           <div>
             <Label>Number of Educational Seminars Attended</Label>
-            <Input type="number" min={0} name="num_seminars_attended" />
-            {errors && "num_seminars_attended" in errors && (
-              <FormError>{errors.num_seminars_attended![0]}</FormError>
-            )}
+            <Input
+              type="number"
+              min={0}
+              name="num_seminars_attended"
+              defaultValue={teacherData?.num_seminars_attended}
+            />
+            <FormError>{state.fieldErrors?.num_seminars_attended}</FormError>
           </div>
           <div>
             <Label>Subject</Label>
             <SSSelect
               name="subjectId"
+              defaultValue={teacherData?.subjectId.toString()}
               options={subjects.map((subject) => ({
                 name: subject.name,
                 value: subject.id.toString(),
               }))}
             />
+            <FormError>{state.fieldErrors?.subjectId}</FormError>
           </div>
         </div>
       </div>
@@ -208,18 +267,31 @@ export default function TeacherForm({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label>Email</Label>
-            <Input type="text" min={0} name="email" />
-            {errors && "email" in errors && (
-              <FormError>{errors.email![0]}</FormError>
-            )}
+            <Input
+              type="text"
+              min={0}
+              name="email"
+              defaultValue={teacherData?.user.email}
+            />
+            <FormError>{state.fieldErrors?.email}</FormError>
           </div>
           <div>
-            <Label>Password</Label>
-            <Input type="password" min={0} name="password" />
-            {errors && "password" in errors && (
-              <FormError>{errors.password![0]}</FormError>
-            )}
+            <Label>Phone Number</Label>
+            <Input
+              type="text"
+              min={0}
+              name="phone_number"
+              defaultValue={teacherData?.phone_number ?? undefined}
+            />
+            <FormError>{state.fieldErrors?.email}</FormError>
           </div>
+          {!teacherId && (
+            <div>
+              <Label>Password</Label>
+              <Input type="password" min={0} name="password" />
+              <FormError>{state.fieldErrors?.password}</FormError>
+            </div>
+          )}
         </div>
       </div>
       {/************ ACCOUNT INFORMATION [end]****************/}

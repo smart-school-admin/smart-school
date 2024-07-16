@@ -6,7 +6,7 @@ import * as fs from "fs";
 import { auth } from "@/auth";
 
 /** schema imports */
-import { csvFileSchema, imageSchema } from "@/lib/schemas";
+import { csvFileSchema, imageSchema, phoneNumberSchema } from "@/lib/schemas";
 import { saveFilePublic } from "@/app/_utils/utils";
 
 /** database imports */
@@ -126,12 +126,7 @@ const studentSchema = z.object({
     .min(1, { message: "At least year 1" })
     .max(6, { message: "At most year 6" }),
   email: z.string().email(),
-  phone_number: z
-    .string()
-    .refine((value) =>
-      /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/.test(value)
-    )
-    .optional(),
+  phone_number: phoneNumberSchema.optional(),
 });
 
 /** function to add a single student */
@@ -311,7 +306,6 @@ export async function updateStudentDetails(
 
   return { success: true };
 }
-
 
 export async function getTeacherStudents(): Promise<{
   errorMessage?: string;
@@ -733,9 +727,9 @@ export async function getTeacherTodaysAbscences(studentId: string) {
   const todaysMeetings = await db.attendance.groupBy({
     by: ["teacherId", "date"],
     where: { teacherId: teacherId, date: new Date() },
-    _count:{
-      teacherId: true
-    }
+    _count: {
+      teacherId: true,
+    },
   });
 
   const totalTodaysMeetings = (todaysMeetings ?? []).length;
@@ -753,7 +747,6 @@ export async function getTeacherAbsencesSummary(studentId: string) {
     today: await getTeacherTodaysAbscences(studentId),
   };
 }
-
 
 /** more general absences */
 export async function getTotalNumberOfAbsences(studentId: string) {
@@ -773,13 +766,12 @@ export async function getTotalNumberOfAbsences(studentId: string) {
 }
 
 export async function getTodaysAbscences(studentId: string) {
-
   const todaysMeetings = await db.attendance.groupBy({
     by: ["teacherId", "date"],
     where: { date: new Date() },
-    _count:{
-      teacherId: true
-    }
+    _count: {
+      teacherId: true,
+    },
   });
 
   const totalTodaysMeetings = (todaysMeetings ?? []).length;
@@ -797,8 +789,6 @@ export async function getAbsencesSummary(studentId: string) {
     today: await getTodaysAbscences(studentId),
   };
 }
-
-
 
 /** function to get total number of students in school */
 export default async function getTotalStudents(schoolId: string) {

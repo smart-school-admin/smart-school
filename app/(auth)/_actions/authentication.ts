@@ -10,7 +10,7 @@ export async function authenticate(
 ) {
 
   try {
-    await signIn('credentials', formData);
+    await signIn('credentials', formData, {callbackUrl: "/login"});
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {

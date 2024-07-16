@@ -1,6 +1,7 @@
 import fs from "fs/promises"
 import path from "path";
 import bcrypt from "bcryptjs";
+import { existsSync } from "fs";
 
 /** function to save file */
 export async function saveFilePublic(
@@ -14,6 +15,12 @@ export async function saveFilePublic(
   const filePath = path.join(folderPath, fileName);
   await fs.writeFile(filePath, Buffer.from(await file.arrayBuffer()));
   return path.join(dirPath, fileName);
+}
+
+export async function deleteFile(filePath: string){
+  if(existsSync(filePath)){
+    await fs.unlink(filePath);
+  }
 }
 
 /** function to hash password */

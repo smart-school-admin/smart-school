@@ -38,7 +38,6 @@ import {
   updateStudentDetails,
   getStudentDetails,
 } from "@/app/(school)/school_admin/_actions/student";
-import { stat } from "fs";
 
 export default function StudentForm({
   courses,

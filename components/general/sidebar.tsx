@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ComponentProps } from "react";
-import { BrainIcon } from "lucide-react";
+import Logo from "./logo";
 
 /** function imports */
 import { cn } from "@/lib/utils";
@@ -23,10 +23,7 @@ export function Sidebar({
       )}
     >
       <div className="flex justify-center items-center py-8">
-        <h1 className="w-20 h-20 bg-white text-ssPrimary-100 rounded-full flex justify-center items-center font-semibold text-lg flex-col">
-          <BrainIcon className="fill-ssPrimary-100 stroke-white" />
-          SSA
-        </h1>
+        <Logo/>
       </div>
       <hr className="mb-4" />
       <div className="flex flex-col gap-2 px-4">{children}</div>

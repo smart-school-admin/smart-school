@@ -5,10 +5,10 @@ import { z } from "zod";
 import { EDUCATION, GENDER, Student, Teacher, USER_ROLE } from "@prisma/client";
 import { auth } from "@/auth";
 import { getSchoolIdByEmail, predictStudentScores } from "./shared";
-import { hashPassword, saveFilePublic } from "@/app/_utils/utils";
-import { imageSchema } from "@/lib/schemas";
+import { deleteFile, hashPassword, saveFilePublic } from "@/app/_utils/utils";
+import { imageSchema, phoneNumberSchema } from "@/lib/schemas";
 import db from "@/db/db";
-import { SECURITY } from "@/lib/constants";
+import { FILE, SECURITY } from "@/lib/constants";
 import { redirect } from "next/navigation";
 
 const requiredMessage = "Required";
@@ -39,9 +39,21 @@ const createTeacherSchema = z.object({
     .refine((password) => SECURITY.PASSWORD_REGEX.test(password), {
       message: SECURITY.PASSWORD_ERROR_MSG,
     }),
+  phone_number: phoneNumberSchema.optional(),
 });
 
-export async function addTeacher(prevState: unknown, formData: FormData) {
+/** function to add a teacher */
+export async function addTeacher(
+  prevState: unknown,
+  formData: FormData
+): Promise<{
+  success?: boolean;
+  errorMessage?: string;
+  fieldErrors?: z.inferFlattenedErrors<
+    typeof createTeacherSchema
+  >["fieldErrors"];
+  data?: any;
+}> {
   const session = await auth();
 
   if (!session || !session.user || !session.user.email) {
@@ -53,7 +65,10 @@ export async function addTeacher(prevState: unknown, formData: FormData) {
   );
 
   if (!validationResult.success)
-    return validationResult.error.formErrors.fieldErrors;
+    return {
+      fieldErrors: validationResult.error.formErrors.fieldErrors,
+      success: false,
+    };
 
   const data = validationResult.data;
 
@@ -86,10 +101,78 @@ export async function addTeacher(prevState: unknown, formData: FormData) {
 
     await db.teacher.create({ data: cleaned });
   } catch (err: any) {
-    return { errorMessage: err.message ?? "Something went wrong" };
+    return {
+      errorMessage: err.message ?? "Something went wrong",
+      success: false,
+    };
   }
 
-  redirect("/school_admin/teachers");
+  return { success: true };
+}
+
+/** function to update teacher data */
+const updateTeacherSchema = createTeacherSchema.extend({
+  image: imageSchema
+    .refine((file) => FILE.MAX_FILE_SIZE_BYTES, {
+      message: FILE.MAX_FILE_SIZE_ERR_MSG,
+    })
+    .optional(),
+  password: z.undefined(),
+});
+export async function updateTeacher(
+  teacherId: string,
+  previousImage: string | undefined,
+  prevState: unknown,
+  formData: FormData
+): Promise<{
+  success?: boolean;
+  fieldErrors?: z.inferFlattenedErrors<
+    typeof updateTeacherSchema
+  >["fieldErrors"];
+  errorMessage?: string;
+}> {
+  const validationResult = updateTeacherSchema.safeParse(
+    Object.fromEntries(formData)
+  );
+  if (!validationResult.success) {
+    return {
+      fieldErrors: validationResult.error.formErrors.fieldErrors,
+      success: false,
+    };
+  }
+
+  try {
+    let imagePath: string | undefined = previousImage;
+
+    if (validationResult.data.image) {
+      const { image } = validationResult.data;
+      imagePath = await saveFilePublic(
+        "/students/",
+        `${validationResult.data.first_name}_${validationResult.data.last_name}_${image.name}`,
+        image
+      );
+
+      if (previousImage) await deleteFile(previousImage);
+    }
+
+    const { image, ...data } = validationResult.data;
+    delete data.password;
+
+    await db.student.update({
+      where: { id: teacherId },
+      data: {
+        ...data,
+        imagePath: imagePath,
+      },
+    });
+  } catch (error: any) {
+    return {
+      errorMessage: error.message ? error.message : "Something went wrong",
+      success: false,
+    };
+  }
+
+  return { success: true };
 }
 
 export async function getTeachers(): Promise<{
@@ -164,15 +247,15 @@ export async function getTotalTodaysMeetings(teacherId: string) {
   return (
     await db.attendance.groupBy({
       by: ["date", "meeting"],
-      where:{
+      where: {
         teacherId: teacherId,
-        date: new Date()
+        date: new Date(),
       },
-      _count:{
-        id: true
-      }
+      _count: {
+        id: true,
+      },
     })
-  ).length
+  ).length;
 }
 
 export async function getAvgStudentPerformance(teacherId: string) {
@@ -210,21 +293,19 @@ export async function getAvgPredictedStudentPerformance(teacherId: string) {
 
   const failureResponse = await db.grade.groupBy({
     by: ["studentId"],
-    where:{
+    where: {
       teacherId: teacherId,
-      passed: false
+      passed: false,
     },
-    _count:{
-      studentId: true
-    }
-  })
+    _count: {
+      studentId: true,
+    },
+  });
 
-  const classFailures:{[key: string]: number} = {};
-  for(let item of failureResponse){
+  const classFailures: { [key: string]: number } = {};
+  for (let item of failureResponse) {
     classFailures[item.studentId] = item._count.studentId;
   }
-
-
 
   const records: (Student & {
     math_intensive: boolean;
@@ -239,7 +320,7 @@ export async function getAvgPredictedStudentPerformance(teacherId: string) {
       math_intensive: item.subject.math_intensive,
       previous_grade: item.score,
       absences: item.student._count.attendance,
-      class_failures: classFailures[item.studentId]
+      class_failures: classFailures[item.studentId],
     });
   }
 
