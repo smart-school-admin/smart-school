@@ -52,8 +52,8 @@ export default function TeacherList({
                   <TableRow
                     key={teacher.id}
                     className={cn(
-                      "cursor-pointer hover:bg-red-500 hover:text-white",
-                      currentTeacher === teacher.id && "bg-red-500 text-white"
+                      "cursor-pointer hover:bg-ssPrimary-300 hover:text-white",
+                      currentTeacher === teacher.id && "bg-ssPrimary-200 text-white"
                     )}
                     onClick={() => setCurrentTeacher(teacher.id)}
                   >

@@ -48,7 +48,7 @@ export default function StudentsList({
             {students.map((student, index) => (
               <TableRow
                 key={student.id}
-                className={cn("cursor-pointer hover:bg-red-500 hover:text-white", (currentStudent === student.id) && "bg-red-500 text-white")}
+                className={cn("cursor-pointer hover:bg-ssPrimary-300 hover:text-white", (currentStudent === student.id) && "bg-ssPrimary-200 text-white")}
                 onClick={() => setCurrentStudent(student.id)}
               >
                 <TableCell className="font-medium flex items-center gap-4">
@@ -74,7 +74,7 @@ export default function StudentsList({
       </div>
       {/** Table for students data end */}
       {/** Student summary start */}
-      <StudentBrief studentId={currentStudent} edit={false} />
+      <StudentBrief studentId={currentStudent} edit={true} />
       {/** Student summary end */}
     </div>
   );

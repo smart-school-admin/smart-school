@@ -5,13 +5,14 @@ import { Card } from "@/components/ui/card";
 import AttendanceAndEvents from "./_components/attendanceAndEvents";
 import FinanceChart from "./_components/financeChart";
 
-/** icon imports */
-import { GraduationCapIcon } from "lucide-react";
-import { BookUserIcon } from "lucide-react";
-import { BookMarkedIcon } from "lucide-react";
 
-import db from "@/db/db";
 import { getDashboardStats } from "../../_actions/student";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: 'SSAS | Admin Dashboard',
+  description: 'administrator dashboard home',
+}
 
 export default async function SchoolAdminDashboardPage() {
   const dashboardStats = await getDashboardStats();

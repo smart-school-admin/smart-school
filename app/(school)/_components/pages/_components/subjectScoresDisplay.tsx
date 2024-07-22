@@ -36,7 +36,7 @@ export default function SubjectScoresDisplay({
       </TableHeader>
       <TableBody>
         {subjects.map((subject, index) => (
-          <TableRow className="h-9">
+          <TableRow className="h-9" key={index}>
             <TableCell>
               {subject.code}-{subject.name}
             </TableCell>

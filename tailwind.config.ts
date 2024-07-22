@@ -25,7 +25,10 @@ const config = {
       },
       colors: {
         ssPrimary: {
-          100: "#D90000",
+          // 100: "#D90000",
+          100: "#09081c",
+          200: "#121126",
+          300: "#1d1c38",
           foreground: "#ffffff",
         },
         ssSecondary: {

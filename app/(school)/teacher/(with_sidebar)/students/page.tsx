@@ -16,7 +16,13 @@ import { getTeacherStudents } from "@/app/(school)/school_admin/_actions/student
 
 /** icon imports */
 import { PlusIcon } from "lucide-react";
+import { Metadata } from "next";
 
+
+export const metadata: Metadata = {
+  title: 'SSAS | Students',
+  description: 'Students list for teachers',
+}
 
 export default async function StudentsPage() {
   const response = await getTeacherStudents();

@@ -83,7 +83,7 @@ model Grade {
   score       Float
   passed      Boolean
   teacher     Teacher  @relation(fields: [teacherId], references: [id])
-  teacherId   String   @default("4f083b21-582e-40bf-b873-00bc6212b39d")
+  teacherId   String  
   dateEntered DateTime @default(now())
 }
 

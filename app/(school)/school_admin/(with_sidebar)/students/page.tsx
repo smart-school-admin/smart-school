@@ -1,5 +1,6 @@
 /** next imports */
 import Link from "next/link";
+import { Metadata } from "next";
 
 /** component imports */
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,11 @@ import { getAllStudents } from "../../_actions/student";
 
 /** icon imports */
 import { PlusIcon } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: 'SSAS | Students',
+  description: 'list of students for on administrator dashboard',
+}
 
 export default async function StudentsPage() {
   const students = await getAllStudents();

@@ -29,12 +29,12 @@ export const authConfig = {
       const isSchoolAdminPath = nextUrl.pathname.startsWith("/school_admin");
       const isTeacherPath = nextUrl.pathname.startsWith("/teacher");
       const isAdminPath = nextUrl.pathname.startsWith("/admin");
-
+      const isHomePath = nextUrl.pathname === "/";
 
       if (isLoggedIn) {
         if (auth?.user.role === "schoolAdmin") {
           if (isSchoolAdminPath) return true;
-          else{
+          else {
             return Response.redirect(
               new URL("/school_admin/dashboard", nextUrl)
             );
@@ -44,9 +44,9 @@ export const authConfig = {
           if (isTeacherPath) return true;
           else return Response.redirect(new URL("/teacher/dashboard", nextUrl));
         }
+      } else if (isAdminPath || isHomePath) {
+        return true;
       } else {
-        if(isAdminPath) return true
-
         return false;
       }
 

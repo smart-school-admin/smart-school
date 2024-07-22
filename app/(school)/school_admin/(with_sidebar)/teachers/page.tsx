@@ -7,6 +7,13 @@ import TeacherList from "@/app/(school)/_components/teachers/teacherList";
 
 /**server functions */
 import { getTeachers } from "../../_actions/teachers";
+import { Metadata } from "next";
+
+
+export const metadata: Metadata = {
+  title: 'SSAS | Teachers',
+  description: 'list of teachers for on administrator dashboard',
+}
 
 export default async function TeachersPage() {
   const response = await getTeachers();
