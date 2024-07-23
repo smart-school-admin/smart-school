@@ -45,12 +45,14 @@ type StudentProfileProps = {
       today: { totalTodaysMeetings: number; totalTodaysAbsences: number };
     };
   };
+  canDelete?: boolean;
 };
 
 export default function StudentProfile({
   studentData,
   grades,
   stats,
+  canDelete
 }: StudentProfileProps) {
   const gradesExtended: {
     subjectId: number;
@@ -140,10 +142,7 @@ export default function StudentProfile({
           {/* <Link href="#">
             <InfoIcon className="w-6 h-6 stroke-blue-700" />
           </Link> */}
-          {/* <Link href="#">
-            <Trash2Icon className="w-6 h-6 stroke-red-700" />
-          </Link> */}
-          <DeleteStudentAlert studentId={studentData.id} />
+          {canDelete && <DeleteStudentAlert studentId={studentData.id} />}
         </div>
         {/** Icons */}
       </div>

@@ -56,6 +56,7 @@ export default function StudentForm({
     queryKey: ["student-data"],
     queryFn: async () => {
       if (studentId) return await getStudentDetails(studentId);
+      else return null;
     },
     refetchOnWindowFocus: false,
   });

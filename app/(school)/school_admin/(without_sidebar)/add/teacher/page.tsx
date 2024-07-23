@@ -3,6 +3,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import db from "@/db/db";
 import MultiTeachersUpload from "./_components/multileTeachersUploadForm";
 import TeacherForm from "./_components/teacherForm";
+import { Metadata } from "next";
+
+export const metadata:Metadata = {
+  title: "Add | Edit Teacher"
+}
 
 export default async function AddStudentPage() {
   const subjects = await db.subject.findMany({

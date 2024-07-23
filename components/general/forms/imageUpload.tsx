@@ -1,18 +1,26 @@
 "use client";
-import Image from "next/image";
 import { ChangeEvent, useState, useRef } from "react";
 import { ImageIcon, XCircleIcon } from "lucide-react";
 
-export function ProfileImageUpload({ imgSrc = "", name, ...props }: { imgSrc?: string, name?:string } & React.HTMLProps<HTMLElement>) {
-  const [src, setSrc] = useState<string | undefined>(props.defaultValue as string??"");
+export function ProfileImageUpload({
+  imgSrc = "",
+  name,
+  ...props
+}: { imgSrc?: string; name?: string } & React.HTMLProps<HTMLElement>) {
+  const [src, setSrc] = useState<string | undefined>(
+    (props.defaultValue as string) ?? ""
+  );
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setSrc(URL.createObjectURL(event.target.files![0]));
+    if (event.target.files && event.target.files.length > 0) {
+      setSrc(URL.createObjectURL(event.target.files![0]));
+    } else {
+      setSrc("");
+    }
   };
   const removeImage = () => {
     fileRef.current!.value = "";
-    console.log(fileRef.current?.files)
     setSrc(undefined);
   };
   return (
@@ -40,7 +48,10 @@ export function ProfileImageUpload({ imgSrc = "", name, ...props }: { imgSrc?: s
         />
       </label>
       {src && (
-        <XCircleIcon className="w-6 h-6 absolute right-1 top-0 fill-ssPrimary-100 stroke-white cursor-pointer" onClick={removeImage} />
+        <XCircleIcon
+          className="w-6 h-6 absolute right-1 top-0 fill-ssPrimary-100 stroke-white cursor-pointer"
+          onClick={removeImage}
+        />
       )}
     </div>
   );

@@ -320,7 +320,7 @@ export async function getAvgPredictedStudentPerformance(teacherId: string) {
       math_intensive: item.subject.math_intensive,
       previous_grade: item.score,
       absences: item.student._count.attendance,
-      class_failures: classFailures[item.studentId],
+      class_failures: classFailures[item.studentId]??0,
     });
   }
 

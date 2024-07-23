@@ -45,7 +45,7 @@ const DateInput: React.FC<React.HTMLProps<HTMLInputElement>> = (props) => {
         </PopoverContent>
       </Popover>
       {/** input to hold value */}
-      <input name={props.name} value={date?.toISOString()} className="hidden" />
+      <input name={props.name} value={date?.toISOString()} className="hidden" readOnly />
     </div>
   );
 };

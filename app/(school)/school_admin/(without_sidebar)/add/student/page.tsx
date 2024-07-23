@@ -3,6 +3,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AddMultipleStudentsForm from "./_components/addMultipleStudentsForm";
 import StudentForm from "./_components/studentForm";
 import db from "@/db/db";
+import { Metadata } from "next";
+
+export const metadata:Metadata = {
+  title: "Add | Edit Student"
+}
 
 export default async function AddStudentPage() {
   const courses = await db.course.findMany({
