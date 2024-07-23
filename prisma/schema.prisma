@@ -75,15 +75,15 @@ model Student {
 
 model Grade {
   id          Int      @id @default(autoincrement())
-  title       String   
+  title       String
   subject     Subject  @relation(fields: [subjectId], references: [id])
   subjectId   Int
-  student     Student  @relation(fields: [studentId], references: [id])
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   studentId   String
   score       Float
   passed      Boolean
   teacher     Teacher  @relation(fields: [teacherId], references: [id])
-  teacherId   String  
+  teacherId   String
   dateEntered DateTime @default(now())
 }
 
@@ -164,7 +164,7 @@ model Attendance {
   date      DateTime @default(now()) @db.Date
   time      DateTime @default(now()) @db.Time()
   present   Boolean
-  student   Student  @relation(fields: [studentId], references: [id])
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   studentId String
   teacher   Teacher  @relation(fields: [teacherId], references: [id])
   teacherId String
@@ -179,6 +179,45 @@ model Class {
   classId  String
 
   @@id(name: "school_class", [schoolId, classId])
+}
+
+// model to store deleted students data (student personal information removed)
+model SavedStudentData {
+  id                    Int                  @id @default(autoincrement())
+  age                   Int //
+  gender                GENDER //
+  address_type          ADDRESS_TYPE //
+  family_size           FAMILY_SIZE //
+  parent_status         PARENT_STATUS //
+  mother_education      EDUCATION //
+  father_education      EDUCATION //
+  mother_job            JOB //
+  father_job            JOB //
+  family_relationship   Int //
+  guardian              GUARDIAN //
+  schoolId              String
+  year                  Int //
+  travel_time           TRAVEL_TIME //
+  school_choice_reason  SCHOOL_CHOICE_REASON //
+  study_time            WEEKLY_STUDY_TIME
+  school_support        Boolean //
+  family_support        Boolean //
+  extra_paid_classes    Boolean //
+  activities            Boolean //
+  nursery_school        Boolean //
+  higher_ed             Boolean //
+  internet_access       Boolean //
+  romantic_relationship Boolean //
+  free_time             Int                  @default(0)
+  social                Int                  @default(0)
+  time_registered       DateTime             @default(now()) //
+  absences              Int
+  state                 String //
+  city                  String //
+  class_failures        Int
+  createdAt             DateTime             @default(now())
+  score                 Float
+  math_intensive        Boolean
 }
 
 // ENUMS
@@ -251,8 +290,3 @@ enum WEEKLY_STUDY_TIME {
   within_5_and_10_hours
   greater_than_10_hours
 }
-
-// enum SEMESTER {
-//   first
-//   second
-// }

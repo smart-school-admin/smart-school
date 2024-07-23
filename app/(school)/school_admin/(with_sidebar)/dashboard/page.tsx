@@ -6,7 +6,7 @@ import AttendanceAndEvents from "./_components/attendanceAndEvents";
 import FinanceChart from "./_components/financeChart";
 
 
-import { getDashboardStats } from "../../_actions/student";
+import { getDashboardStats } from "../../_actions/school_admin";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -41,10 +41,10 @@ export default async function SchoolAdminDashboardPage() {
         </div>
         <div className="flex flex-col gap-8">
           <div>
-            <AttendanceAndEvents />
+            <AttendanceAndEvents studentPercentagePresent={dashboardStats.totalStudentPresent/dashboardStats.totalMeetings * 100} />
           </div>
           <div className="flex justify-center w-full">
-            <SSCalendar className="w-full" />
+            <SSCalendar className="flex-grow" />
           </div>
         </div>
       </div>

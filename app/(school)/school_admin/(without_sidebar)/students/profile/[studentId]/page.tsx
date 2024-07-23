@@ -1,6 +1,11 @@
 import StudentProfile from "@/app/(school)/_components/pages/studentProfile";
 import { getAbsencesSummary} from "@/app/(school)/school_admin/_actions/student";
 import db from "@/db/db";
+import { Metadata } from "next";
+
+export const metadata:Metadata = {
+  title: "Student Profile"
+}
 
 export default async function StudentProfilePage({
   params,

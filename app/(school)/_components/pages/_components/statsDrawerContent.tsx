@@ -44,7 +44,7 @@ export default function StatsDrawerContent({
         {predictionsData && (
           <div className="flex gap-32 items-center">
             <div>
-              <div className="text-center"><span className="text-ssPrimary-100">Red</span> = Negative Effect</div>
+              <div className="text-center"><span className="text-red-600">Red</span> = Negative Effect</div>
               <ExplanationsPlot explanations={predictionsData.explanations} />
             </div>
             <div>

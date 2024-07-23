@@ -20,6 +20,7 @@ import {
   GUARDIAN,
   JOB,
   PARENT_STATUS,
+  SavedStudentData,
   SCHOOL_CHOICE_REASON,
   TRAVEL_TIME,
   WEEKLY_STUDY_TIME,
@@ -814,6 +815,17 @@ export async function getTotalTeachers(schoolId: string) {
   )._count.id;
 }
 
+export async function getTotalPresents(schoolId: string){
+  const presents = await db.attendance.aggregate({
+    where: {present: true},
+    _count:{
+      id: true
+    }
+  })
+
+  return presents._count.id;
+}
+
 /** function to get dashboard information for school admin */
 export async function getDashboardStats() {
   const session = await auth();
@@ -833,5 +845,108 @@ export async function getDashboardStats() {
   return {
     numStudents: await getTotalStudents(school?.schoolId),
     numTeachers: await getTotalTeachers(school?.schoolId),
+    totalStudentPresent: await getTotalPresents(school?.schoolId)
+    
   };
+}
+
+/** function to delete student */
+export async function deleteStudent(studentId: string) {
+  try {
+    // save the student data in separate database
+    const student = await db.student.findUnique({
+      where: {
+        id: studentId,
+      },
+      select: {
+        age: true,
+        gender: true,
+        address_type: true,
+        family_size: true,
+        parent_status: true,
+        mother_education: true,
+        father_education: true,
+        mother_job: true,
+        father_job: true,
+        family_relationship: true,
+        guardian: true,
+        schoolId: true,
+        year: true,
+        travel_time: true,
+        school_choice_reason: true,
+        study_time: true,
+        school_support: true,
+        family_support: true,
+        extra_paid_classes: true,
+        activities: true,
+        nursery_school: true,
+        higher_ed: true,
+        internet_access: true,
+        romantic_relationship: true,
+        free_time: true,
+        social: true,
+        time_registered: true,
+        state: true,
+        city: true,
+        grades: {
+          select: {
+            score: true,
+            passed: true,
+            subject: {
+              select: { math_intensive: true },
+            },
+          },
+        },
+        attendance: {
+          select: { present: true },
+        },
+      },
+    });
+
+    if (!student) {
+      return { errorMessage: "Student not found", success: false };
+    }
+
+    // save the students data
+    let absences = 0;
+    student.attendance.forEach((item) => {
+      if (!item.present) absences += 1;
+    });
+
+    // getting number of failures
+    let class_failures = 0;
+    student.grades.forEach((item) => {
+      if (!item.passed) class_failures += 1;
+    });
+
+    const entries: Omit<SavedStudentData, "id" | "createdAt">[] = [];
+
+    const { grades, attendance, ...studentData } = student;
+
+    student.grades.forEach((grade) => {
+      entries.push({
+        ...studentData,
+        class_failures: 0,
+        absences: absences,
+        score: grade.score,
+        math_intensive: grade.subject.math_intensive,
+      });
+    });
+
+    await db.savedStudentData.createMany({ data: entries });
+
+    await db.student.delete({
+      where: {
+        id: studentId,
+      },
+    });
+
+    return { success: true };
+  } catch (error: any) {
+    return {
+      errorMessage:
+        error && error.message ? error.message : "Something went wrong",
+      success: false,
+    };
+  }
 }

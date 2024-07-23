@@ -14,18 +14,20 @@ export default function StudentBrief({
   edit = true,
   ...props
 }: { studentId?: string, edit?: boolean } & React.HTMLProps<HTMLElement>) {
+  const { data, isLoading, error, isError } = useQuery({
+    queryKey: ["student data", studentId],
+    queryFn: async () => {
+      if (studentId) return await getStudentDetails(studentId);
+      else return null;
+    },
+  });
+
   if (!studentId)
     return (
       <div className="flex justify-center items-center">
         No Student Selected
       </div>
     );
-  const { data, isLoading, error, isError } = useQuery({
-    queryKey: ["student data", studentId],
-    queryFn: async () => {
-      if (studentId) return await getStudentDetails(studentId);
-    },
-  });
 
   if (isError) {
     return (

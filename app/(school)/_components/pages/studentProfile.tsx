@@ -7,7 +7,8 @@ import {
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { MailIcon, PhoneCallIcon } from "lucide-react";
+import { MailIcon, PhoneCallIcon, Trash2Icon, InfoIcon } from "lucide-react";
+import { DeleteStudentAlert } from "../../school_admin/(without_sidebar)/students/profile/[studentId]/_components/singleStudentActions";
 
 import { Drawer, DrawerTrigger } from "@/components/ui/drawer";
 import StatsDrawerContent from "./_components/statsDrawerContent";
@@ -136,6 +137,13 @@ export default function StudentProfile({
           <Link href={`mailto:${studentData!.email}`}>
             <MailIcon className="w-6 h-6 stroke-ssGray-300" />
           </Link>
+          {/* <Link href="#">
+            <InfoIcon className="w-6 h-6 stroke-blue-700" />
+          </Link> */}
+          {/* <Link href="#">
+            <Trash2Icon className="w-6 h-6 stroke-red-700" />
+          </Link> */}
+          <DeleteStudentAlert studentId={studentData.id} />
         </div>
         {/** Icons */}
       </div>
@@ -146,7 +154,7 @@ export default function StudentProfile({
           <div className="flex gap-12">
             <div>
               <div>
-                <span className="text-ssGray-200 text-sm">Average</span>
+                <span className="text-ssPrimary-300 text-sm">Average</span>
 
                 <div
                   className={cn(
@@ -162,7 +170,7 @@ export default function StudentProfile({
             </div>
             <div>
               <div>
-                <span className="text-ssGray-200 text-sm">
+                <span className="text-ssPrimary-300 text-sm">
                   Predicted Average
                 </span>
                 <Drawer>
@@ -184,7 +192,7 @@ export default function StudentProfile({
               </div>
             </div>
             <div>
-              <span className="text-ssGray-200 text-sm">Abscences</span>
+              <span className="text-ssPrimary-300 text-sm">Abscences</span>
               <div className="text-5xl text-black">
                 {stats.absences.summary && (
                   <span
@@ -208,13 +216,13 @@ export default function StudentProfile({
           <h3 className="text-2xl text-ssGray-300">LIVE UPDATES</h3>
           <div className="flex gap-12">
             <div>
-              <span className="text-ssGray-200 text-sm">Todays Abscences</span>
+              <span className="text-ssPrimary-300 text-sm">Todays Abscences</span>
               <div className="text-5xl text-black">
                 {abscencesSummary && (
                   <span
                     className={cn(
                       stats.absences.today.totalTodaysAbsences >
-                      stats.absences.today.totalTodaysMeetings/ 2
+                        stats.absences.today.totalTodaysMeetings / 2
                         ? "text-red-700"
                         : "text-green-700"
                     )}
