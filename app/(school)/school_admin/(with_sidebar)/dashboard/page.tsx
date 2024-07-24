@@ -4,6 +4,7 @@ import SSCalendar from "@/components/general/ssCalendar";
 import { Card } from "@/components/ui/card";
 import AttendanceAndEvents from "./_components/attendanceAndEvents";
 import FinanceChart from "./_components/financeChart";
+import SortedByPredAvgStudents from "./_components/sortedPredictedAvgStudentList";
 
 
 import { getDashboardStats } from "../../_actions/school_admin";
@@ -35,7 +36,8 @@ export default async function SchoolAdminDashboardPage() {
           </div>
           <Card>
             <div className="w-full h-[450px]">
-              <FinanceChart />
+              {/* <FinanceChart /> */}
+              <SortedByPredAvgStudents students={dashboardStats.leastPredictedAvgStudents??[]}/>
             </div>
           </Card>
         </div>

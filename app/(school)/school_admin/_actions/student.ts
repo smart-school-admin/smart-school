@@ -29,7 +29,7 @@ import {
 /** for parsing */
 import { parseStream, parseString } from "fast-csv";
 import { Student } from "@prisma/client";
-import { TypeOf, z } from "zod";
+import { string, TypeOf, z } from "zod";
 
 /** functions */
 import { getSchoolIdByEmail, getSessionId } from "./shared";
@@ -815,13 +815,13 @@ export async function getTotalTeachers(schoolId: string) {
   )._count.id;
 }
 
-export async function getTotalPresents(schoolId: string){
+export async function getTotalPresents(schoolId: string) {
   const presents = await db.attendance.aggregate({
-    where: {present: true},
-    _count:{
-      id: true
-    }
-  })
+    where: { present: true },
+    _count: {
+      id: true,
+    },
+  });
 
   return presents._count.id;
 }
@@ -845,8 +845,7 @@ export async function getDashboardStats() {
   return {
     numStudents: await getTotalStudents(school?.schoolId),
     numTeachers: await getTotalTeachers(school?.schoolId),
-    totalStudentPresent: await getTotalPresents(school?.schoolId)
-    
+    totalStudentPresent: await getTotalPresents(school?.schoolId),
   };
 }
 
@@ -948,5 +947,111 @@ export async function deleteStudent(studentId: string) {
         error && error.message ? error.message : "Something went wrong",
       success: false,
     };
+  }
+}
+
+/** function to get students in danger (with bad predicted averages) */
+export async function getStudentPredictionsWitIds() {
+  const session = await auth();
+
+  if (!session || !session.user || !session.user.id) {
+    redirect("/");
+  }
+
+  const schoolAdminId = session.user.id;
+
+  const schoolId = (
+    await db.schoolAdministrator.findUnique({ where: { id: schoolAdminId } })
+  )?.schoolId;
+
+  if (!schoolId) redirect("/");
+
+  const samples: any[] = [];
+  const students = await db.student.findMany({
+    where: { schoolId: schoolId },
+    include: {
+      _count: {
+        select: {
+          grades: { where: { passed: false } },
+          attendance: { where: { present: false } },
+        },
+      },
+      grades: {
+        select: {
+          score: true,
+          subject: {
+            select: {
+              math_intensive: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  for (let student of students) {
+    const { _count, grades, ...studentData } = student;
+    grades.forEach((grade) => {
+      samples.push({
+        ...studentData,
+        absences: _count.attendance,
+        class_failures: _count.grades,
+        math_intensive: grade.subject.math_intensive,
+        previous_grade: grade.score,
+      });
+    });
+  }
+
+  try {
+    const response = await axios.post(
+      `${process.env.ML_API_ROOT}/${ML_API_ENDPOINTS.studentGradePredictWithId}`,
+      samples,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const items: {
+      id: string;
+      first_name: string;
+      last_name: string;
+      other_names: string;
+      class: string;
+      index_number: number;
+      email: string | null;
+      imagePath: string | null;
+      predictedGrades: number[];
+    }[] = [];
+    const data = response.data;
+    for (let student of students) {
+      if (student.id in data) {
+        items.push({
+          id: student.id,
+          index_number: student.index_number,
+          first_name: student.first_name,
+          last_name: student.last_name,
+          other_names: student.other_names,
+          class: "SC1",
+          email: student.email,
+          imagePath: student.imagePath,
+          predictedGrades: data[student.id]
+        })
+      }
+    }
+
+    return {data: items, success: true};
+  } catch (error: any) {
+    if (error.response) {
+      return {
+        error: `${error.status}:${error.message ?? "unfavorable response"}`,
+        success: false
+      };
+    } else if (error.request) {
+      return { error: error.message ? error.message : "No response received", success: false };
+    } else {
+      return { error: error.message ?? "Something went wrong", success: false };
+    }
   }
 }
