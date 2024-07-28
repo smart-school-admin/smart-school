@@ -40,9 +40,9 @@ export default function StatsDrawerContent({
           Predictions for various subjects and explanations
         </DrawerDescription>
       </DrawerHeader>
-      <div className="flex justify-around items-center">
+      <div className="flex px-8 items-center w-full">
         {predictionsData && (
-          <div className="flex gap-32 items-center">
+          <div className="flex gap-32 items-center justify-center w-full">
             <div>
               <div className="text-center"><span className="text-red-600">Red</span> = Negative Effect</div>
               <ExplanationsPlot explanations={predictionsData.explanations} />

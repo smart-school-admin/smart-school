@@ -26,12 +26,12 @@ export default function SubjectScoresDisplay({
 }) {
 
   return (
-    <Table className="text-xs w-96">
+    <Table className=" w-96">
       <TableHeader>
         <TableRow>
           <TableCell></TableCell>
           <TableCell>Actual</TableCell>
-          <TableCell>Predictd</TableCell>
+          <TableCell>Predicted</TableCell>
         </TableRow>
       </TableHeader>
       <TableBody>
