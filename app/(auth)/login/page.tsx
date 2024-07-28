@@ -1,5 +1,10 @@
 /** component imports */
 import LoginForm from "../_components/loginForm";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "SSAS | Login"
+}
 
 export default async function LoginPage() {
   return (

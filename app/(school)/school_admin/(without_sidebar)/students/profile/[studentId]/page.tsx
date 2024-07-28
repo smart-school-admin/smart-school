@@ -1,5 +1,5 @@
 import StudentProfile from "@/app/(school)/_components/pages/studentProfile";
-import { getAbsencesSummary} from "@/app/(school)/school_admin/_actions/student";
+import { getAbsencesSummaryAdmin} from "@/app/(school)/school_admin/_actions/student";
 import db from "@/db/db";
 import { Metadata } from "next";
 
@@ -65,7 +65,7 @@ export default async function StudentProfilePage({
   });
 
   const stats = {
-    absences: await getAbsencesSummary(params.studentId)
+    absences: await getAbsencesSummaryAdmin(params.studentId)
   }
 
   return <StudentProfile studentData={studentData!} grades={subjectScores} stats={stats} canDelete={true}/>;

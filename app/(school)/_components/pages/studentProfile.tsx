@@ -52,7 +52,7 @@ export default function StudentProfile({
   studentData,
   grades,
   stats,
-  canDelete
+  canDelete,
 }: StudentProfileProps) {
   const gradesExtended: {
     subjectId: number;
@@ -97,16 +97,6 @@ export default function StudentProfile({
   predictedAvg =
     gradesExtended.length > 0 ? predictedAvg / gradesExtended.length : -1;
 
-  const {
-    data: abscencesSummary,
-    isLoading: abscencesLoading,
-    error: abscencesError,
-    isError: abscencesIsError,
-  } = useQuery({
-    queryKey: ["abscences_data"],
-    queryFn: async () => await getTeacherAbsencesSummary(studentData.id),
-    refetchOnWindowFocus: false,
-  });
 
   if (error && error.message) toast.error(error.message);
 
@@ -206,7 +196,6 @@ export default function StudentProfile({
                     {stats.absences.summary.totalNumberOfMeetings}
                   </span>
                 )}
-                {abscencesLoading && <span>...</span>}
               </div>
             </div>
           </div>
@@ -215,22 +204,21 @@ export default function StudentProfile({
           <h3 className="text-2xl text-ssGray-300">LIVE UPDATES</h3>
           <div className="flex gap-12">
             <div>
-              <span className="text-ssPrimary-300 text-sm">Todays Abscences</span>
+              <span className="text-ssPrimary-300 text-sm">
+                Todays Abscences
+              </span>
               <div className="text-5xl text-black">
-                {abscencesSummary && (
-                  <span
-                    className={cn(
-                      stats.absences.today.totalTodaysAbsences >
-                        stats.absences.today.totalTodaysMeetings / 2
-                        ? "text-red-700"
-                        : "text-green-700"
-                    )}
-                  >
-                    {stats.absences.today.totalTodaysAbsences}/
-                    {stats.absences.today.totalTodaysMeetings}
-                  </span>
-                )}
-                {abscencesLoading && <span>...</span>}
+                <span
+                  className={cn(
+                    stats.absences.today.totalTodaysAbsences >
+                      stats.absences.today.totalTodaysMeetings / 2
+                      ? "text-red-700"
+                      : "text-green-700"
+                  )}
+                >
+                  {stats.absences.today.totalTodaysAbsences}/
+                  {stats.absences.today.totalTodaysMeetings}
+                </span>
               </div>
             </div>
           </div>

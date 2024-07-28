@@ -67,12 +67,12 @@ export default function AttendanceAndEvents({
           <span className="text-sm">
             {studentPercentagePresent.toFixed(2)}%
           </span>
-          <ViewDetailsLink href="#" className="mt-auto" />
+          {/* <ViewDetailsLink href="#" className="mt-auto" /> */}
         </div>
         <div className="bg-ssPrimary-100 flex text-white flex-col gap-2 p-4 rounded-md">
           <span className="text-sm">Teacher Attendance</span>
           <span className="text-sm">100%</span>
-          <ViewDetailsLink href="#" className="mt-auto" />
+          {/* <ViewDetailsLink href="#" className="mt-auto" /> */}
         </div>
       </div>
       <div className="mt-4">
