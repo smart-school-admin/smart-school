@@ -29,6 +29,7 @@ export default async function StudentProfilePage({
     WHERE row_num = 1;
   `;
 
+
   const studentData = await db.student.findUnique({
     where: { id: params.studentId },
     select: {
@@ -53,6 +54,7 @@ export default async function StudentProfilePage({
     },
   });
 
+
   const subjectScores: {
     [key: string]: { score: number; passed: boolean; semester: number };
   } = {};
@@ -63,6 +65,7 @@ export default async function StudentProfilePage({
       semester: item.semester,
     };
   });
+
 
   const stats = {
     absences: await getAbsencesSummaryAdmin(params.studentId)

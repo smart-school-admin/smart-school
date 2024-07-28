@@ -1,6 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import Logo from "@/components/general/logo";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "SSAS"
+}
 
 export default function Home() {
   return (

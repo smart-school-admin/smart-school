@@ -1,14 +1,15 @@
+"use client"
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-  } from "@/components/ui/table";
-  import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useRouter } from "next/navigation";
 
 export default function SortedByPredAvgStudents({
   students,
@@ -24,10 +25,13 @@ export default function SortedByPredAvgStudents({
     predictedAverage: number;
   }[];
 }) {
+  const router = useRouter();
   return (
     <div className="w-full">
       {students.length < 1 ? (
-        <div className="w-full h-full flex justify-center items-center pt-12">No Students</div>
+        <div className="w-full h-full flex justify-center items-center pt-12">
+          No Students
+        </div>
       ) : (
         <div className="p-4">
           <h1 className="mb-4 text-center text-xl">
@@ -48,8 +52,9 @@ export default function SortedByPredAvgStudents({
                 <TableRow
                   key={student.id}
                   className={cn(
-                    "cursor-pointer hover:bg-ssPrimary-300 hover:text-white",
+                    "cursor-pointer hover:bg-ssPrimary-300 hover:text-white"
                   )}
+                  onClick={() => router.push(`/school_admin/students/profile/${student.id}`)}
                 >
                   <TableCell className="font-medium flex items-center gap-4">
                     <Avatar className="w-10 h-10">
@@ -68,7 +73,9 @@ export default function SortedByPredAvgStudents({
                   <TableCell>{student.index_number}</TableCell>
                   <TableCell>{student.email ?? "Unavailable"}</TableCell>
                   <TableCell>SC1</TableCell>
-                  <TableCell className="font-bold text-red-700">{student.predictedAverage.toFixed(2)}</TableCell>
+                  <TableCell className="font-bold text-red-700">
+                    {student.predictedAverage.toFixed(2)}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
