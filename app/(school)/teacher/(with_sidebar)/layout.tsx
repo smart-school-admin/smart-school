@@ -18,9 +18,9 @@ export default function TeacherLayout({
   return (
     <section className="h-screen flex">
       <Sidebar>
-        <SidebarItem href="/school_admin/dashboard">
+        {/* <SidebarItem href="/school_admin/dashboard">
           <LayoutDashboardIcon /> Dashboard
-        </SidebarItem>
+        </SidebarItem> */}
         <SidebarItem href="/teacher/students">
           <BookUserIcon /> Students
         </SidebarItem>

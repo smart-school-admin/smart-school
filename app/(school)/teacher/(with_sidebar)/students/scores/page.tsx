@@ -1,5 +1,10 @@
 import { getTeacherStudents } from "../../../../school_admin/_actions/student";
 import ScoresUploadTable from "../../../_components/scoresUploadTable";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "SSAS | Scores"
+}
 
 export default async function ScoresUploadPage() {
   const response = await getTeacherStudents();

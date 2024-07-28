@@ -726,7 +726,7 @@ export async function getTeacherTodaysAbscences(studentId: string) {
   const teacherId = session.user.id;
 
   const todaysMeetings = await db.attendance.groupBy({
-    by: ["teacherId", "date"],
+    by: ["teacherId", "date", "meeting"],
     where: { teacherId: teacherId, date: new Date() },
     _count: {
       teacherId: true,
@@ -784,10 +784,39 @@ export async function getTodaysAbscences(studentId: string) {
   return { totalTodaysMeetings, totalTodaysAbsences };
 }
 
+/** function to get all absences for all classes for the current day */
+export async function getAllClassesAbsencesToday(studentId: string){
+  const todaysMeetings = await db.attendance.findMany({
+    where:{
+      studentId: studentId,
+      date: new Date()
+    }
+  });
+
+  const totalTodaysMeetings = (todaysMeetings ?? []).length;
+  let totalAbsences = 0;
+
+  for(let meeting of todaysMeetings){
+    totalAbsences += Number(!meeting.present);
+  }
+  const totalTodaysAbsences = totalAbsences;
+
+  return { totalTodaysMeetings, totalTodaysAbsences };
+}
+
+/** function to get absences summary for teacher for a student */
 export async function getAbsencesSummary(studentId: string) {
   return {
     summary: await getTotalNumberOfAbsences(studentId),
     today: await getTodaysAbscences(studentId),
+  };
+}
+
+/** function to get absences summary for admin for student */
+export async function getAbsencesSummaryAdmin(studentId: string) {
+  return {
+    summary: await getTotalNumberOfAbsences(studentId),
+    today: await getAllClassesAbsencesToday(studentId),
   };
 }
 

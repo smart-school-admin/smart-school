@@ -10,7 +10,7 @@ export async function authenticate(
 ) {
 
   try {
-    await signIn('credentials', formData, {callbackUrl: "/login"});
+    await signIn("credentials", formData);
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
@@ -25,5 +25,5 @@ export async function authenticate(
 }
 
 export async function logOut(){
-  await signOut();
+  await signOut({redirectTo:"/", redirect: true});
 }
