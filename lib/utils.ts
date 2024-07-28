@@ -2,6 +2,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { string } from "zod";
+import { ML_API } from "./constants";
 /** shadcn imports end */
 
 /** for shadcn start */
@@ -20,4 +21,9 @@ export function objectToOptions(container: {
   }
 
   return holder;
+}
+
+export function formatExplanation(explanation: string){
+  // return explanation.match(ML_API.EXPLANATIONS_REG)![1]
+  return explanation.replace(/(categorical|numerical)__/,"");
 }

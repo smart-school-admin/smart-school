@@ -18,7 +18,7 @@ export default async function StudentProfilePage({
     FROM (
       SELECT 
         *,
-        ROW_NUMBER() OVER (PARTITION BY "subjectId"  ORDER BY "dateEntered") AS row_num
+        ROW_NUMBER() OVER (PARTITION BY "subjectId"  ORDER BY "dateEntered" DESC) AS row_num
       FROM "Grade" WHERE "studentId"=${params.studentId}
     ) AS numbered_rows
     WHERE row_num = 1;
