@@ -54,7 +54,7 @@ export default function TeacherBrief({
     >
       <div>
         <Avatar className="w-40 h-40 my-6">
-          <AvatarImage src={data?.imagePath ?? ""} />
+          <AvatarImage src={data?.imagePath ?? ""} className="object-cover" />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div>

@@ -711,7 +711,7 @@ export async function getTeacherTotalNumberOfAbsences(studentId: string) {
 
   const totalNumberOfMeetings = (allMeetings ?? []).length;
   const abscentMeetings = await db.attendance.findMany({
-    where: { studentId: studentId, present: false },
+    where: { studentId: studentId, present: false, teacherId: teacherId },
   });
   const totalAbsences = (abscentMeetings ?? []).length;
 
@@ -735,7 +735,7 @@ export async function getTeacherTodaysAbscences(studentId: string) {
 
   const totalTodaysMeetings = (todaysMeetings ?? []).length;
   const abscentMeetings = await db.attendance.findMany({
-    where: { studentId: studentId, present: false, date: new Date() },
+    where: { studentId: studentId, present: false, date: new Date(), teacherId: teacherId },
   });
   const totalTodaysAbsences = (abscentMeetings ?? []).length;
 
@@ -1008,6 +1008,8 @@ export async function getStudentPredictionsWitIds() {
       grades: {
         select: {
           score: true,
+          dateEntered: true,
+          subjectId: true,
           subject: {
             select: {
               math_intensive: true,
@@ -1020,13 +1022,23 @@ export async function getStudentPredictionsWitIds() {
 
   for (let student of students) {
     const { _count, grades, ...studentData } = student;
-    grades.forEach((grade) => {
+    grades.sort((a,b) => a.dateEntered.getTime() - b.dateEntered.getTime())
+    const holder:{[key: string]: {math_intensive: boolean, previous_grade: number}} = {}
+    for(let grade of grades){
+      holder[grade.subjectId] = {
+        math_intensive: grade.subject.math_intensive,
+        previous_grade: grade.score
+      }
+    }
+    const values = Object.values(holder);
+
+    values.forEach((grade) => {
       samples.push({
         ...studentData,
         absences: _count.attendance,
         class_failures: _count.grades,
-        math_intensive: grade.subject.math_intensive,
-        previous_grade: grade.score,
+        math_intensive: grade.math_intensive,
+        previous_grade: grade.previous_grade,
       });
     });
   }

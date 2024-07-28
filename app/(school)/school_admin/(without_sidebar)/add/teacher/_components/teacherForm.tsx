@@ -252,7 +252,7 @@ export default function TeacherForm({
               name="subjectId"
               defaultValue={teacherData?.subjectId.toString()}
               options={subjects.map((subject) => ({
-                name: subject.name,
+                name: `${subject.code}-${subject.name}`,
                 value: subject.id.toString(),
               }))}
             />
