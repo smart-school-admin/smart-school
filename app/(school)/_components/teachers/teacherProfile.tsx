@@ -80,7 +80,7 @@ export default function TeacherProfile({
                     : "text-red-700"
                 )}
               >
-                {stats.averageStudentPerformance}
+                {stats.averageStudentPerformance.toFixed(2)}
               </div>
             </div>
             <div>
